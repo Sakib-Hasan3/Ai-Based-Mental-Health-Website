@@ -1,0 +1,85 @@
+# ============================================
+# MENTORA - Robots Exclusion File
+# ============================================
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /database/
+Disallow: /logs/
+Disallow: /temp/
+Disallow: /uploads/
+Disallow: /vendor/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /cron/
+
+# Allow specific folders
+Allow: /assets/css/
+Allow: /assets/js/
+Allow: /assets/images/
+Allow: /pages/
+
+# Crawl delay (for politeness)
+Crawl-delay: 10
+
+# Sitemap location
+Sitemap: https://www.mentora.com/sitemap.xml
+
+# ============================================
+# Specific Bot Rules
+# ============================================
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+Disallow: /database/
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /includes/
+
+# Baidu
+User-agent: Baiduspider
+Disallow: /
+
+# Yahoo
+User-agent: Slurp
+Allow: /
+Disallow: /admin/
+
+# Yandex
+User-agent: Yandex
+Allow: /
+Disallow: /admin/
+
+# ============================================
+# Bad Bots - Block completely
+# ============================================
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: magpie-crawler
+Disallow: /
+
+# ============================================
+# End of robots.txt
+# ============================================

@@ -1,0 +1,308 @@
+# ============================================
+# MENTORA - Apache Configuration
+# ============================================
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# ============================================
+# SECURITY HEADERS
+# ============================================
+
+# Prevent XSS attacks
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (adjust as needed)
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'"
+</IfModule>
+
+# ============================================
+# URL REWRITING - SEO FRIENDLY URLs
+# ============================================
+
+# Remove .php extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Custom URLs
+RewriteRule ^mentor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/mentor-profile.php?id=$1 [L,QSA]
+RewriteRule ^doctor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/doctor-profile.php?id=$1 [L,QSA]
+RewriteRule ^article/([0-9]+)/([a-zA-Z0-9-]+)$ pages/blog-single.php?id=$1 [L,QSA]
+RewriteRule ^forum/([0-9]+)/([a-zA-Z0-9-]+)$ pages/forum-topic.php?id=$1 [L,QSA]
+
+# ============================================
+# REDIRECT RULES
+# ============================================
+
+# Redirect www to non-www
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# Redirect HTTP to HTTPS (uncomment when SSL is installed)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Redirect index.php to root
+RewriteCond %{THE_REQUEST} ^.*/index\.php
+RewriteRule ^(.*)index.php$ /$1 [R=301,L]
+
+# ============================================
+# ERROR PAGES
+# ============================================
+
+ErrorDocument 400 /pages/400.php
+ErrorDocument 401 /pages/401.php
+ErrorDocument 403 /pages/403.php
+ErrorDocument 404 /pages/404.php
+ErrorDocument 500 /pages/500.php
+ErrorDocument 503 /pages/503.php
+
+# ============================================
+# DIRECTORY PROTECTION
+# ============================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Protect sensitive directories
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect includes folder
+<IfModule mod_rewrite.c>
+    RewriteRule ^includes/.*$ - [F,L]
+</IfModule>
+
+# Protect database folder
+<IfModule mod_rewrite.c>
+    RewriteRule ^database/.*\.sql$ - [F,L]
+</IfModule>
+
+# Protect logs folder
+<IfModule mod_rewrite.c>
+    RewriteRule ^logs/.*\.log$ - [F,L]
+</IfModule>
+
+# ============================================
+# FILE ACCESS CONTROL
+# ============================================
+
+# Block access to hidden files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to backup files
+<FilesMatch "\.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|yml|yaml|lock|env)$">
+    Order allow,deny
+    Deny from all
+    Satisfy All
+</FilesMatch>
+
+# Protect htaccess file
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Protect htpasswd file
+<Files .htpasswd>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ============================================
+# CACHE CONTROL
+# ============================================
+
+# Enable compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE font/ttf font/otf image/svg+xml
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS, JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    
+    # Default
+    ExpiresDefault "access plus 1 month"
+</IfModule>
+
+# ============================================
+# CORS HEADERS
+# ============================================
+
+<IfModule mod_headers.c>
+    # Allow cross-domain fonts
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>
+
+# ============================================
+# PHP SETTINGS
+# ============================================
+
+<IfModule mod_php7.c>
+    # Maximum upload size
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    
+    # Session settings
+    php_value session.gc_maxlifetime 7200
+    php_value session.cookie_lifetime 0
+    php_value session.cookie_httponly 1
+    php_value session.use_strict_mode 1
+    
+    # Error reporting (turn off in production)
+    php_flag display_errors on
+    php_flag log_errors on
+    php_value error_log logs/error.log
+    
+    # Timezone
+    php_value date.timezone Asia/Dhaka
+</IfModule>
+
+# ============================================
+# URL ACCESS RULES
+# ============================================
+
+# Allow direct access to assets
+RewriteCond %{REQUEST_URI} ^/assets/.*$
+RewriteRule ^ - [L]
+
+# Allow direct access to uploads
+RewriteCond %{REQUEST_URI} ^/uploads/.*$
+RewriteRule ^ - [L]
+
+# Allow direct access to vendor
+RewriteCond %{REQUEST_URI} ^/vendor/.*$
+RewriteRule ^ - [L]
+
+# ============================================
+# BOT BLOCKING (Optional)
+# ============================================
+
+# Block bad bots
+RewriteCond %{HTTP_USER_AGENT} (ahrefs|semrush|majestic|rogerbot) [NC]
+RewriteRule .* - [F,L]
+
+# ============================================
+# RATE LIMITING (Basic)
+# ============================================
+
+# Prevent DOS attacks - limit requests per IP
+<IfModule mod_ratelimit.c>
+    SetOutputFilter RATE_LIMIT
+    SetEnv rate-limit 400
+</IfModule>
+
+# ============================================
+# CUSTOM RULES FOR MENTORA
+# ============================================
+
+# Protect admin area with password (optional)
+# <FilesMatch "admin">
+#     AuthName "Admin Access"
+#     AuthType Basic
+#     AuthUserFile /path/to/.htpasswd
+#     Require valid-user
+# </FilesMatch>
+
+# Force download for CV files
+<FilesMatch "\.(pdf|doc|docx)$">
+    ForceType application/octet-stream
+    Header set Content-Disposition attachment
+</FilesMatch>
+
+# ============================================
+# MOBILE DETECTION & REDIRECT
+# ============================================
+
+# Redirect mobile users to mobile version (if you have separate mobile site)
+# RewriteCond %{HTTP_USER_AGENT} "android|blackberry|iphone|ipod|iemobile|opera mobile|palmos|webos|googlebot-mobile" [NC]
+# RewriteCond %{HTTP_HOST} !^m\.
+# RewriteRule ^(.*)$ http://m.mentora.com/$1 [R,L]
+
+# ============================================
+# SSL CONFIGURATION (Uncomment when SSL is installed)
+# ============================================
+
+# <IfModule mod_ssl.c>
+#     # Enforce HTTPS
+#     RewriteCond %{HTTPS} !=on
+#     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+#     
+#     # HSTS (uncomment after SSL is working)
+#     # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+# </IfModule>
+
+# ============================================
+# MAINTENANCE MODE
+# ============================================
+
+# Uncomment during maintenance
+# RewriteCond %{REQUEST_URI} !/maintenance\.php$
+# RewriteCond %{REMOTE_ADDR} !^123\.456\.789\.000
+# RewriteRule .* /maintenance.php [R=302,L]
+
+# ============================================
+# PERFORMANCE OPTIMIZATION
+# ============================================
+
+# Enable Keep-Alive
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
+# Set charset
+AddDefaultCharset UTF-8
+
+# ============================================
+# MIME TYPES
+# ============================================
+
+AddType application/javascript .js
+AddType text/css .css
+AddType image/webp .webp
+AddType font/ttf .ttf
+AddType font/otf .otf
+AddType font/woff .woff
+AddType font/woff2 .woff2
+
+# ============================================
+# END OF CONFIGURATION
+# ============================================
