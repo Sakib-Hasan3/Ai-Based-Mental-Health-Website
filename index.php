@@ -1,439 +1,796 @@
-<?php
-require_once 'db.php';
-session_start();
-
-// Get featured mentors
-$mentors = fetchAll("SELECT * FROM users u JOIN mentors m ON u.id = m.user_id WHERE m.verification_status = 'verified' LIMIT 4");
-
-// Get featured doctors
-$doctors = fetchAll("SELECT * FROM users u JOIN doctors d ON u.id = d.user_id WHERE d.verification_status = 'verified' LIMIT 4");
-
-// Get blog posts
-$blogs = fetchAll("SELECT * FROM articles ORDER BY created_at DESC LIMIT 3");
-?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentora - Your Companion in Mental Wellness Journey</title>
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>মেন্টোরা · বাংলায় মানসিক স্বাস্থ্য</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Noto Sans Bengali + fallback -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans Bengali', 'Segoe UI', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* bengali friendly spacing */
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* header / navbar */
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 30, 30, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 12px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #0d9488; /* teal-600 */
+        }
+
+        .logo span {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #115e59; /* deeper teal */
+        }
+
+        .logo span small {
+            font-size: 16px;
+            font-weight: 400;
+            color: #2c3e50;
+            margin-left: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 18px;
+            transition: 0.2s;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 4px;
+        }
+
+        .nav-links a:hover {
+            color: #0f766e;
+            border-bottom-color: #14b8a6;
+        }
+
+        .btn {
+            background: #14b8a6;
+            color: white !important;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-block;
+            text-decoration: none;
+            border-bottom: none !important;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #14b8a6;
+            color: #115e59 !important;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 2px solid #14b8a6;
+            color: #0f766e;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .btn-login:hover {
+            background: #14b8a6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .btn-signup {
+            background: #14b8a6;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .btn-signup:hover {
+            background: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+            color: white;
+        }
+
+        .btn:hover {
+            background: #0f766e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(20, 184, 166, 0.2);
+        }
+
+        /* hero */
+        .hero {
+            background: linear-gradient(145deg, #f0fdfa 0%, #ffffff 100%);
+            padding: 60px 0 40px 0;
+        }
+
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            flex: 1 1 400px;
+        }
+
+        .hero-badge {
+            background: #ccf0e9;
+            color: #0d5e5a;
+            padding: 6px 14px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            color: #0f172a;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-highlight {
+            color: #0d9488;
+            border-bottom: 3px solid #99f6e4;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            color: #334155;
+            margin-bottom: 30px;
+            max-width: 550px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            flex: 1 1 300px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400"><path fill="%23b2f0e6" d="M250,50C140,50,50,140,50,250s90,200,200,200s200-90,200-200S360,50,250,50z M250,400c-82.7,0-150-67.3-150-150s67.3-150,150-150s150,67.3,150,150S332.7,400,250,400z"/><circle fill="%2314b8a6" cx="250" cy="200" r="40"/><circle fill="%23f59e0b" cx="180" cy="260" r="30"/><circle fill="%233b82f6" cx="330" cy="280" r="35"/><path fill="%230f766e" d="M210,310c20,25,60,25,80,0"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            min-height: 300px;
+        }
+
+        /* features / services */
+        .section-title {
+            text-align: center;
+            margin: 50px 0 30px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: #0f172a;
+        }
+
+        .section-title p {
+            color: #475569;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 32px 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 100, 90, 0.1);
+            transition: 0.3s ease;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 40px -15px #14b8a680;
+        }
+
+        .card i {
+            font-size: 44px;
+            color: #14b8a6;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #475569;
+            font-size: 16px;
+        }
+
+        /* Steps Grid */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin: 50px auto;
+            max-width: 1000px;
+            width: 100%;
+            justify-items: center;
+            align-items: start;
+        }
+
+        .step-card {
+            text-align: center;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: #14b8a6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            font-weight: 700;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 30px -5px rgba(20, 184, 166, 0.3);
+        }
+
+        .step-card h3 {
+            font-size: 24px;
+            color: #0f172a;
+            margin-bottom: 15px;
+        }
+
+        .step-card p {
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* PSTU section */
+        .pstu-highlight {
+            background: #e6fffa;
+            border-radius: 60px;
+            padding: 50px 40px;
+            margin: 60px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .pstu-content {
+            flex: 2 1 300px;
+        }
+
+        .pstu-content h3 {
+            font-size: 32px;
+            color: #0b4f4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pstu-content h3 i {
+            font-size: 40px;
+        }
+
+        .pstu-content p {
+            font-size: 18px;
+            margin: 20px 0 10px;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .pill {
+            background: white;
+            color: #115e59;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: 1px solid #5eead4;
+        }
+
+        .pstu-map {
+            flex: 1 1 200px;
+            background: #d9f2ee;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            color: #0b4f4a;
+        }
+
+        .pstu-map i {
+            font-size: 70px;
+            opacity: 0.9;
+        }
+
+        /* experts */
+        .experts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .expert-card {
+            background: white;
+            border-radius: 30px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.02);
+            border: 1px solid #f1f5f9;
+        }
+
+        .expert-avatar {
+            background: #ccf0e9;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #115e59;
+        }
+
+        /* testimonials */
+        .testimonial {
+            background: white;
+            border-radius: 40px;
+            padding: 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 25px -8px #99f6e4;
+        }
+
+        .testimonial-flex {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .testimonial blockquote {
+            font-size: 22px;
+            font-weight: 500;
+            color: #0f172a;
+            border-left: 5px solid #14b8a6;
+            padding-left: 30px;
+            flex: 3;
+        }
+
+        .testimonial-author {
+            flex: 1;
+            text-align: center;
+        }
+
+        .author-name {
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(130deg, #115e59, #0d9488);
+            border-radius: 50px;
+            padding: 60px 40px;
+            color: white;
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .cta-section h2 {
+            font-size: 38px;
+            margin-bottom: 15px;
+        }
+
+        .cta-section .btn {
+            background: white;
+            color: #115e59 !important;
+            font-size: 20px;
+            padding: 16px 44px;
+            margin-top: 20px;
+        }
+
+        /* footer */
+        .footer {
+            background: #0f172a;
+            color: #cbd5e1;
+            padding: 50px 0 30px;
+            border-radius: 40px 40px 0 0;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-logo span {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .footer-links a {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            margin: 8px 0;
+        }
+
+        .footer-links a:hover {
+            color: #99f6e4;
+        }
+
+        .copyright {
+            text-align: center;
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+            padding-top: 30px;
+            color: #94a3b8;
+        }
+
+        /* bengali adjustments */
+        .bn {
+            word-break: normal;
+        }
+
+        @media (max-width: 700px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .hero-content h1 {
+                font-size: 36px;
+            }
+            .auth-buttons {
+                width: 100%;
+                justify-content: center;
+                gap: 8px;
+            }
+            .btn-login,
+            .btn-signup {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .step-number {
+                width: 80px;
+                height: 80px;
+                font-size: 36px;
+            }
+            .step-card h3 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
-    <div class="container">
-        <a class="navbar-brand" href="index.php">
-            <img src="assets/images/logo.png" alt="Mentora" height="40">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="index.php">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/about.php">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/services.php">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/mentors.php">Mentors</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/doctors.php">Doctors</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/blog.php">Blog</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="pages/contact.php">Contact</a>
-                </li>
-                <?php if(isset($_SESSION['user_id'])): ?>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary ms-2" href="user/dashboard.php">Dashboard</a>
-                    </li>
-                <?php else: ?>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary ms-2" href="auth/login.php">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary ms-2" href="auth/register.php">Register</a>
-                    </li>
-                <?php endif; ?>
-            </ul>
+<!-- ======== Header ======== -->
+<header class="navbar">
+    <div class="container nav-container">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>মেন্টোরা <small>Mentora</small></span>
+        </div>
+        <div class="nav-links">
+            <a href="#home">মূলপাতা</a>
+            <a href="#services">সেবাসমূহ</a>
+            <a href="auth/login.php">বিশেষজ্ঞ</a>
+            <a href="auth/login.php">ব্লগ</a>
+            <a href="auth/login.php">যোগাযোগ</a>
+        
+        </div>
+        <div class="auth-buttons">
+            <a href="auth/login.php" class="btn-login">লগইন</a>
+            <a href="auth/register.php" class="btn-signup">সাইন আপ</a>
         </div>
     </div>
-</nav>
+</header>
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
-                    Your Companion in <span class="text-primary">Mental Wellness</span> Journey
-                </h1>
-                <p class="lead mb-4">
-                    Connect with verified mentors, doctors, and AI-powered support for your mental wellness journey. Available 24/7 in Bengali.
-                </p>
-                <div class="d-flex gap-3">
-                    <a href="auth/register.php" class="btn btn-primary btn-lg">Get Started Free</a>
-                    <a href="#how-it-works" class="btn btn-outline-primary btn-lg">Learn More</a>
-                </div>
-                <div class="row mt-5">
-                    <div class="col-4">
-                        <h3 class="h2 fw-bold">500+</h3>
-                        <p class="text-muted">Verified Mentors</p>
-                    </div>
-                    <div class="col-4">
-                        <h3 class="h2 fw-bold">200+</h3>
-                        <p class="text-muted">Qualified Doctors</p>
-                    </div>
-                    <div class="col-4">
-                        <h3 class="h2 fw-bold">10k+</h3>
-                        <p class="text-muted">Happy Users</p>
-                    </div>
-                </div>
+<!-- ======== Hero / প্রধান অংশ ======== -->
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-content">
+            <span class="hero-badge"><i class="fas fa-brain" style="margin-right: 6px;"></i> বাংলাদেশের প্রথম AI মানসিক স্বাস্থ্য প্ল্যাটফর্ম</span>
+            <h1>আপনার মানসিক সুস্থতার <span class="hero-highlight">বিশ্বস্ত সঙ্গী</span></h1>
+            <p>AI চ্যাটবট, বিশেষজ্ঞ মেন্টর এবং আত্ম-উন্নয়ন কোর্সের মাধ্যমে আপনার মানসিক স্বাস্থ্যের যত্ন নিন — সম্পূর্ণ বাংলায়, সম্পূর্ণ গোপনীয়।</p>
+            <div class="hero-buttons">
+                <a href="auth/login.php" class="btn">মন খুলে বলুন <i class="fas fa-arrow-right"></i></a>
+                <a href="#services" class="btn-outline btn">আমাদের সম্পর্কে</a>
             </div>
-            <div class="col-lg-6">
-                <img src="assets/images/illustrations/hero-image.svg" alt="Hero" class="img-fluid">
-            </div>
+        </div>
+        <div class="hero-image">
+            <!-- pure css abstract art / bengali wellbeing -->
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="features-section py-5 bg-light">
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold">Why Choose Mentora?</h2>
-            <p class="lead text-muted">Comprehensive mental wellness platform tailored for Bangladesh</p>
+<!-- ======== বিশেষ সেবা ======== -->
+<div class="container" id="services">
+    <div class="section-title">
+        <h2>আমাদের সুবিধাসমূহ</h2>
+        <p>মানসিক স্বাস্থ্য সেবা এখন আপনার হাতের মুঠোয়। সবকিছু এক জায়গায়।</p>
+    </div>
+    <div class="cards-grid">
+        <div class="card">
+            <i class="fas fa-comments"></i>
+            <h3>মনের বন্ধু AI চ্যাটবট</h3>
+            <p>২৪/৭ বাংলায় কথা বলুন আমাদের AI চ্যাটবটের সাথে। আপনার মানসিক স্বাস্থ্যের যত্ন নিন যেকোনো সময়।</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-primary bg-opacity-10 rounded-circle p-3 mb-3">
-                            <i class="fas fa-robot fa-2x text-primary"></i>
-                        </div>
-                        <h4>AI Companion</h4>
-                        <p class="text-muted">24/7 AI chatbot "মনের বন্ধু" for immediate support in Bengali</p>
-                    </div>
-                </div>
+        <div class="card">
+            <i class="fas fa-users"></i>
+            <h3>বিশেষজ্ঞ মেন্টর</h3>
+            <p>যাচাইকৃত মানসিক স্বাস্থ্য বিশেষজ্ঞ ও ক্যারিয়ার মেন্টরদের সাথে ভিডিও সেশন নিন।</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-book-open"></i>
+            <h3>আত্ম-উন্নয়ন কোর্স</h3>
+            <p>স্ট্রেস ম্যানেজমেন্ট, মেডিটেশন, ক্যারিয়ার গাইডেন্স সহ বিভিন্ন কোর্সে ভর্তি হন।</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-shield"></i>
+            <h3>সম্পূর্ণ গোপনীয়তা</h3>
+            <p>আপনার সব তথ্য এন্ড-টু-এন্ড এনক্রিপ্টেড। সম্পূর্ণ গোপনীয়তার নিশ্চয়তা।</p>
+        </div>
+    </div>
+</div>
+
+<!-- ======== কীভাবে কাজ করে ======== -->
+<div class="container" style="margin: 80px 0;">
+    <div class="section-title">
+        <h2>কীভাবে কাজ করে?</h2>
+        <p>মাত্র তিনটি পদক্ষেপে শুরু করুন আপনার সুস্থতার যাত্রা।</p>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">০१</div>
+            <h3>আকাউন্ট তৈরি করুন</h3>
+            <p>ইমেইল বা ফোন নম্বর দিয়ে সহজে নিবন্ধন করুন</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">०२</div>
+            <h3>মেজাজ ট্র্যাক করুন</h3>
+            <p>প্রতিদিন আপনার মানসিক অবস্থা ট্র্যাক করুন</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">०३</div>
+            <h3>সাহায্য নিন</h3>
+            <p>AI চ্যাটবট বা বিশেষজ্ঞ মেন্টরের কাছ থেকে সাহায্য নিন</p>
+        </div>
+    </div>
+</div>
+
+<!-- ======== PSTU বিশেষত্ব ======== -->
+<div class="container">
+    <div class="pstu-highlight">
+        <div class="pstu-content">
+            <h3><i class="fas fa-university"></i> পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়</h3>
+            <p>মেন্টোরা শুরু হয়েছে  একঝাঁক উদ্যমী শিক্ষার্থীর হাত ধরে। সাইকোলজি ও সিএসই  বিভাগের সম্মিলিত প্রচেষ্টায় তৈরি এই প্ল্যাটফর্ম দেশীয় প্রেক্ষাপটে মানসিক স্বাস্থ্য সচেতনতা বাড়াতে কাজ করছে।</p>
+            <div class="pill-group">
+                <span class="pill"><i class="far fa-check-circle"></i> গবেষণা-সমর্থিত</span>
+                <span class="pill"><i class="far fa-check-circle"></i> দেশীয় বিশেষজ্ঞ</span>
+                <span class="pill"><i class="far fa-check-circle"></i> বিনামূল্যের বেসিক সেবা</span>
             </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-success bg-opacity-10 rounded-circle p-3 mb-3">
-                            <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
-                        </div>
-                        <h4>Expert Mentors</h4>
-                        <p class="text-muted">Verified mentors for career, academic, and life guidance</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon bg-info bg-opacity-10 rounded-circle p-3 mb-3">
-                            <i class="fas fa-user-md fa-2x text-info"></i>
-                        </div>
-                        <h4>Medical Consultation</h4>
-                        <p class="text-muted">Connect with qualified doctors for professional medical advice</p>
-                    </div>
-                </div>
+        </div>
+        <div class="pstu-map">
+            <i class="fas fa-location-dot"></i>
+            <h4>পটুয়াখালী, বাংলাদেশ</h4>
+            <p>ক্যাম্পাস থেকে শুরু, সারা দেশে</p>
+        </div>
+    </div>
+</div>
+
+<!-- ======== বিশেষজ্ঞ প্যানেল ======== -->
+<div class="container">
+    <div class="section-title">
+        <h2>আমাদের উপদেষ্টা ও থেরাপিস্ট</h2>
+        <p>বিশ্ববিদ্যালয়ের শিক্ষক ও পেশাদার সাইকোলজিস্ট</p>
+    </div>
+    <div class="experts-grid">
+        <div class="expert-card">
+            <div class="expert-avatar"><i class="fas fa-user-md"></i></div>
+            <h3>ড. নাফিজা হক</h3>
+            <p>ক্লিনিক্যাল সাইকোলজিস্ট</p>
+        </div>
+        <div class="expert-card">
+            <div class="expert-avatar"><i class="fas fa-user-tie"></i></div>
+            <h3>অধ্যাপক মোঃ আনিস</h3>
+            <p>সাইকিয়াট্রি, পশুপ</p>
+        </div>
+        <div class="expert-card">
+            <div class="expert-avatar"><i class="fas fa-user-nurse"></i></div>
+            <h3>সাদিয়া ইসলাম</h3>
+            <p>কাউন্সেলর ও প্রশিক্ষক</p>
+        </div>
+        <div class="expert-card">
+            <div class="expert-avatar"><i class="fas fa-users"></i></div>
+            <h3>ছাত্র স্বেচ্ছাসেবক</h3>
+            <p>পিয়ার সাপোর্ট গ্রুপ</p>
+        </div>
+    </div>
+</div>
+
+<!-- ======== ব্যবহারকারীর মতামত ======== -->
+<div class="container">
+    <div class="testimonial">
+        <div class="testimonial-flex">
+            <blockquote>
+                “মেন্টোরার গ্রুপ থেরাপিতে আমি প্রথম বুঝতে পারি আমার অনুভূতি অস্বাভাবিক না। বাংলায়, নিজের ভাষায় এত যত্ন পাওয়া সত্যিই অভাবনীয়। পশুপের ছাত্ররা অসাধারণ কাজ করেছে।”
+            </blockquote>
+            <div class="testimonial-author">
+                <i class="fas fa-user-circle" style="font-size: 60px; color: #14b8a6;"></i>
+                <div class="author-name">তানভীর আনজুম রাহাত</div>
+                <div style="color: #475569;">পটুয়াখালী</div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- How It Works -->
-<section id="how-it-works" class="how-it-works py-5">
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold">How It Works</h2>
-            <p class="lead text-muted">Start your wellness journey in three simple steps</p>
-        </div>
-        <div class="row">
-            <div class="col-md-4 text-center">
-                <div class="step-number bg-primary text-white rounded-circle mb-3">1</div>
-                <h4>Create Account</h4>
-                <p class="text-muted">Sign up free and complete your wellness assessment</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="step-number bg-primary text-white rounded-circle mb-3">2</div>
-                <h4>Choose Your Support</h4>
-                <p class="text-muted">Select AI chat, mentor, or doctor based on your needs</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="step-number bg-primary text-white rounded-circle mb-3">3</div>
-                <h4>Start Your Journey</h4>
-                <p class="text-muted">Begin sessions and track your wellness progress</p>
+<div class="container">
+    <div class="testimonial">
+        <div class="testimonial-flex">
+            <blockquote>
+                “মেন্টোরার সাহায্যে আমি খুব সহজে আমার ডিপ্রেশন লেভেল কতটুকু প্রেডিক্ট করতে পারি এবং মনের বন্ধু চ্যাটবটের সাথে কথা বলে সাজেশন নিতে পারে”
+            </blockquote>
+            <div class="testimonial-author">
+                <i class="fas fa-user-circle" style="font-size: 60px; color: #14b8a6;"></i>
+                <div class="author-name">রাহিনা আকতার</div>
+                <div style="color: #475569;">ঢাকা </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Featured Mentors -->
-<section class="featured-mentors py-5 bg-light">
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="display-5 fw-bold">Top Mentors</h2>
-            <a href="pages/mentors.php" class="btn btn-outline-primary">View All <i class="fas fa-arrow-right ms-2"></i></a>
-        </div>
-        <div class="row g-4">
-            <?php foreach($mentors as $mentor): ?>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm mentor-card">
-                    <img src="assets/uploads/profiles/<?php echo $mentor['profile_image'] ?? 'default-avatar.png'; ?>" 
-                         class="card-img-top rounded-circle mx-auto mt-4" style="width: 100px; height: 100px; object-fit: cover;" 
-                         alt="<?php echo $mentor['name']; ?>">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><?php echo $mentor['name']; ?></h5>
-                        <p class="text-primary mb-2"><?php echo $mentor['specialization']; ?></p>
-                        <div class="mb-2">
-                            <i class="fas fa-star text-warning"></i>
-                            <span><?php echo number_format($mentor['rating'], 1); ?></span>
-                            <span class="text-muted ms-2">(<?php echo $mentor['total_sessions']; ?> sessions)</span>
-                        </div>
-                        <p class="card-text text-muted small"><?php echo substr($mentor['bio'], 0, 80); ?>...</p>
-                        <a href="pages/mentor-profile.php?id=<?php echo $mentor['id']; ?>" class="btn btn-outline-primary btn-sm">View Profile</a>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
+<!-- ======== Call to action / সরাসরি কথা বলুন ======== -->
+<div class="container">
+    <div class="cta-section">
+        <h2>আপনি একা নন, আমরা আছি পাশে</h2>
+        <p style="font-size: 20px; max-width: 600px; margin: 0 auto;">বিনামূল্যে প্রথম সেশন বুক করুন অথবা চ্যাট শুরু করুন। সম্পূর্ণ গোপনীয়।</p>
+        <a href="auth/login.php" class="btn">এখনই কথা বলুন <i class="fas fa-arrow-right"></i></a>
     </div>
-</section>
+</div>
 
-<!-- Featured Doctors -->
-<section class="featured-doctors py-5">
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="display-5 fw-bold">Expert Doctors</h2>
-            <a href="pages/doctors.php" class="btn btn-outline-primary">View All <i class="fas fa-arrow-right ms-2"></i></a>
+<!-- ======== ফুটার ======== -->
+<footer class="footer">
+    <div class="container footer-grid">
+        <div class="footer-logo">
+            <span>মেন্টোরা</span>
+            <p style="margin-top: 15px;">বাংলায় মানসিক সুস্থতা<br>পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়</p>
         </div>
-        <div class="row g-4">
-            <?php foreach($doctors as $doctor): ?>
-            <div class="col-md-3">
-                <div class="card h-100 border-0 shadow-sm doctor-card">
-                    <img src="assets/uploads/profiles/<?php echo $doctor['profile_image'] ?? 'default-avatar.png'; ?>" 
-                         class="card-img-top rounded-circle mx-auto mt-4" style="width: 100px; height: 100px; object-fit: cover;" 
-                         alt="<?php echo $doctor['name']; ?>">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><?php echo $doctor['name']; ?></h5>
-                        <p class="text-info mb-2"><?php echo $doctor['specialization']; ?></p>
-                        <p class="small text-muted"><?php echo $doctor['degree']; ?></p>
-                        <div class="mb-2">
-                            <i class="fas fa-star text-warning"></i>
-                            <span><?php echo number_format($doctor['rating'], 1); ?></span>
-                            <span class="text-muted ms-2">Fee: ৳<?php echo $doctor['consultation_fee']; ?></span>
-                        </div>
-                        <a href="pages/doctor-profile.php?id=<?php echo $doctor['id']; ?>" class="btn btn-outline-info btn-sm">View Profile</a>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
+        <div class="footer-links">
+            <h4 style="color: white;">সহায়তা</h4>
+            <a href="#">আমাদের সম্পর্কে</a>
+            <a href="#">গোপনীয়তা নীতি</a>
+            <a href="#">সেবার শর্তাবলী</a>
         </div>
-    </div>
-</section>
-
-<!-- AI Chatbot Preview -->
-<section class="chatbot-preview py-5 bg-primary bg-opacity-10">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h2 class="display-5 fw-bold mb-4">Meet "মনের বন্ধু"</h2>
-                <p class="lead mb-4">Our AI companion available 24/7 to listen, understand, and support you in Bengali. No judgement, just support.</p>
-                <ul class="list-unstyled mb-4">
-                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Bengali language support</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Mood tracking & analysis</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Crisis detection & support</li>
-                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Weekly wellness reports</li>
-                </ul>
-                <a href="auth/register.php" class="btn btn-primary btn-lg">Try AI Chat Now</a>
-            </div>
-            <div class="col-lg-6">
-                <img src="assets/images/illustrations/chatbot-preview.svg" alt="Chatbot Preview" class="img-fluid">
+        <div class="footer-links">
+            <h4 style="color: white;">যোগাযোগ</h4>
+            <a href="#"><i class="fas fa-envelope"></i> mentora@pstu.ac.bd</a>
+            <a href="#"><i class="fas fa-phone"></i> ০১৮৬৯৭৯৩১৩৯</a>
+            <div style="margin-top: 10px;">
+                <i class="fab fa-facebook" style="font-size: 24px; margin-right: 12px;"></i>
+                <i class="fab fa-instagram" style="font-size: 24px; margin-right: 12px;"></i>
+                <i class="fab fa-linkedin" style="font-size: 24px;"></i>
             </div>
         </div>
     </div>
-</section>
-
-<!-- Testimonials -->
-<section class="testimonials py-5">
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold">What Our Users Say</h2>
-            <p class="lead text-muted">Real stories from real people</p>
-        </div>
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="mb-4">"মনের বন্ধু আমাকে আমার উদ্বেগ কাটিয়ে উঠতে অনেক সাহায্য করেছে। ২৪/৭ সাপোর্ট পাচ্ছি।"</p>
-                        <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/female-1.png" class="rounded-circle me-3" width="50" alt="User">
-                            <div>
-                                <h6 class="mb-0">রহিমা খাতুন</h6>
-                                <small class="text-muted">Student, Dhaka</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="mb-4">"The mentors here are amazing! Got career guidance that changed my life."</p>
-                        <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/male-1.png" class="rounded-circle me-3" width="50" alt="User">
-                            <div>
-                                <h6 class="mb-0">Karim Ahmed</h6>
-                                <small class="text-muted">Professional, Chittagong</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                            <i class="fas fa-star text-warning"></i>
-                        </div>
-                        <p class="mb-4">"Easy appointment with doctors, digital prescriptions, and medicine reminders."</p>
-                        <div class="d-flex align-items-center">
-                            <img src="assets/images/avatars/female-2.png" class="rounded-circle me-3" width="50" alt="User">
-                            <div>
-                                <h6 class="mb-0">Nasrin Sultana</h6>
-                                <small class="text-muted">Homemaker, Sylhet</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Blog Section -->
-<section class="blog-section py-5 bg-light">
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="display-5 fw-bold">Latest from Blog</h2>
-            <a href="pages/blog.php" class="btn btn-outline-primary">View All <i class="fas fa-arrow-right ms-2"></i></a>
-        </div>
-        <div class="row g-4">
-            <?php foreach($blogs as $blog): ?>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <img src="assets/images/blog/<?php echo $blog['image']; ?>" class="card-img-top" alt="<?php echo $blog['title']; ?>">
-                    <div class="card-body">
-                        <div class="text-muted small mb-2"><?php echo date('M d, Y', strtotime($blog['created_at'])); ?></div>
-                        <h5 class="card-title"><?php echo $blog['title']; ?></h5>
-                        <p class="card-text text-muted"><?php echo substr($blog['content'], 0, 100); ?>...</p>
-                        <a href="pages/blog-single.php?id=<?php echo $blog['id']; ?>" class="btn btn-link p-0">Read More <i class="fas fa-arrow-right ms-1"></i></a>
-                    </div>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta-section py-5 bg-primary text-white">
-    <div class="container py-5 text-center">
-        <h2 class="display-5 fw-bold mb-4">Ready to Start Your Wellness Journey?</h2>
-        <p class="lead mb-4">Join thousands of Bangladeshis who are taking care of their mental health</p>
-        <a href="auth/register.php" class="btn btn-light btn-lg px-5">Sign Up Free</a>
-    </div>
-</section>
-
-<!-- Footer -->
-<footer class="footer bg-dark text-white pt-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <img src="assets/images/logo-white.png" alt="Mentora" height="40" class="mb-3">
-                <p>Your companion in mental wellness journey. Available 24/7 for all Bangladeshis.</p>
-                <div class="social-links">
-                    <a href="#" class="text-white me-2"><i class="fab fa-facebook fa-lg"></i></a>
-                    <a href="#" class="text-white me-2"><i class="fab fa-twitter fa-lg"></i></a>
-                    <a href="#" class="text-white me-2"><i class="fab fa-linkedin fa-lg"></i></a>
-                    <a href="#" class="text-white me-2"><i class="fab fa-instagram fa-lg"></i></a>
-                </div>
-            </div>
-            <div class="col-md-2 mb-4">
-                <h5>Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="pages/about.php" class="text-white-50">About Us</a></li>
-                    <li><a href="pages/services.php" class="text-white-50">Services</a></li>
-                    <li><a href="pages/mentors.php" class="text-white-50">Mentors</a></li>
-                    <li><a href="pages/doctors.php" class="text-white-50">Doctors</a></li>
-                    <li><a href="pages/blog.php" class="text-white-50">Blog</a></li>
-                </ul>
-            </div>
-            <div class="col-md-2 mb-4">
-                <h5>Support</h5>
-                <ul class="list-unstyled">
-                    <li><a href="pages/faq.php" class="text-white-50">FAQ</a></li>
-                    <li><a href="pages/contact.php" class="text-white-50">Contact</a></li>
-                    <li><a href="pages/privacy-policy.php" class="text-white-50">Privacy Policy</a></li>
-                    <li><a href="pages/terms.php" class="text-white-50">Terms of Use</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5>Contact Info</h5>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Dhaka, Bangladesh</li>
-                    <li class="mb-2"><i class="fas fa-phone me-2"></i> +880 1234-567890</li>
-                    <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@mentora.com</li>
-                </ul>
-            </div>
-        </div>
-        <hr class="border-secondary">
-        <div class="row pb-3">
-            <div class="col text-center">
-                <p class="mb-0">&copy; <?php echo date('Y'); ?> Mentora. All rights reserved.</p>
-            </div>
-        </div>
+    <div class="container copyright">
+        © ২০২৬ মেন্টোরা · পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়ের শিক্ষার্থীদের উদ্যোগ
     </div>
 </footer>
 
-<!-- Scripts -->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/main.js"></script>
-
+<!-- optional small js for interactivity (placeholder) -->
+<script>
+    (function() {
+        // make buttons smoother, future enhancement
+        console.log("মেন্টোরা — বাংলায় মানসিক স্বাস্থ্য সবার জন্য।");
+    })();
+</script>
 </body>
 </html>
