@@ -1,249 +1,146 @@
 <?php
-/**
- * MENTORA - Core Functions File
- */
+// includes/functions.php
 
-// Note: Database functions (query, fetchOne, etc.) are already in db.php
-// Do NOT redefine them here to avoid conflicts
+session_start();
+require_once __DIR__ . '/../config/database.php';
 
-// Authentication functions
-if (!function_exists('isLoggedIn')) {
-    function isLoggedIn() {
-        return isset($_SESSION['user_id']);
-    }
+// Get database instance
+function getDB() {
+    return Database::getInstance();
 }
 
-if (!function_exists('isAdmin')) {
-    function isAdmin() {
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
-    }
+// Check if user is logged in
+function isLoggedIn() {
+    return isset($_SESSION['user_id']);
 }
 
-if (!function_exists('isMentor')) {
-    function isMentor() {
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'mentor';
-    }
-}
-
-if (!function_exists('isDoctor')) {
-    function isDoctor() {
-        return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'doctor';
-    }
-}
-
-if (!function_exists('redirect')) {
-    function redirect($url) {
-        header("Location: $url");
+// Redirect to login if not authenticated
+function requireLogin() {
+    if (!isLoggedIn()) {
+        header('Location: /mentora/auth/login.php');
         exit();
     }
 }
 
-// Sanitization functions
-if (!function_exists('sanitize')) {
-    function sanitize($input) {
-        global $conn;
-        return htmlspecialchars(strip_tags(trim(mysqli_real_escape_string($conn, $input))));
-    }
-}
-
-if (!function_exists('sanitizeEmail')) {
-    function sanitizeEmail($email) {
-        return filter_var(trim($email), FILTER_SANITIZE_EMAIL);
-    }
-}
-
-// Validation functions
-if (!function_exists('validateEmail')) {
-    function validateEmail($email) {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
-    }
-}
-
-if (!function_exists('validatePhone')) {
-    function validatePhone($phone) {
-        return preg_match('/^01[3-9]\d{8}$/', $phone);
-    }
-}
-
-if (!function_exists('validatePassword')) {
-    function validatePassword($password) {
-        // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-        return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/', $password);
-    }
-}
-
-// Notification functions
-if (!function_exists('setFlashMessage')) {
-    function setFlashMessage($type, $message) {
-        $_SESSION['flash'] = [
-            'type' => $type,
-            'message' => $message
-        ];
-    }
-}
-
-if (!function_exists('getFlashMessage')) {
-    function getFlashMessage() {
-        if (isset($_SESSION['flash'])) {
-            $flash = $_SESSION['flash'];
-            unset($_SESSION['flash']);
-            return $flash;
-        }
+// Get current user data
+function getCurrentUser() {
+    if (!isLoggedIn()) {
         return null;
     }
+    
+    $db = getDB();
+    $user = $db->getSingle(
+        "SELECT id, full_name, email, phone, user_type, profile_image, bio, is_verified FROM users WHERE id = ?",
+        [$_SESSION['user_id']]
+    );
+    
+    return $user;
 }
 
-if (!function_exists('displayFlashMessage')) {
-    function displayFlashMessage() {
-        $flash = getFlashMessage();
-        if ($flash) {
-            $alertClass = $flash['type'] === 'success' ? 'alert-success' : 
-                         ($flash['type'] === 'error' ? 'alert-danger' : 'alert-info');
-            echo "<div class='alert $alertClass alert-dismissible fade show' role='alert'>
-                    {$flash['message']}
-                    <button type='button' class='btn-close' data-bs-dismiss='alert'></button>
-                  </div>";
-        }
+// Hash password
+function hashPassword($password) {
+    return password_hash($password, PASSWORD_DEFAULT);
+}
+
+// Verify password
+function verifyPassword($password, $hash) {
+    return password_verify($password, $hash);
+}
+
+// Generate CSRF token
+function generateCSRFToken() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
+    return $_SESSION['csrf_token'];
 }
 
-// Date/Time functions
-if (!function_exists('formatDate')) {
-    function formatDate($date, $format = 'd M, Y') {
-        return date($format, strtotime($date));
+// Verify CSRF token
+function verifyCSRFToken($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// Set flash message
+function setFlashMessage($type, $message) {
+    $_SESSION['flash'] = [
+        'type' => $type,
+        'message' => $message
+    ];
+}
+
+// Get flash message
+function getFlashMessage() {
+    if (isset($_SESSION['flash'])) {
+        $flash = $_SESSION['flash'];
+        unset($_SESSION['flash']);
+        return $flash;
     }
+    return null;
 }
 
-if (!function_exists('timeAgo')) {
-    function timeAgo($datetime) {
-        $time = strtotime($datetime);
-        $now = time();
-        $diff = $now - $time;
+// Display flash message
+function displayFlashMessage() {
+    $flash = getFlashMessage();
+    if ($flash) {
+        $alertClass = $flash['type'] === 'success' ? 'alert-success' : 'alert-danger';
+        return '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">
+                    ' . htmlspecialchars($flash['message']) . '
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>';
+    }
+    return '';
+}
+
+// Validate email
+function validateEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+}
+
+// Validate phone (Bangladeshi format)
+function validatePhone($phone) {
+    return preg_match('/^(?:\+88|01)?\d{11}$/', $phone);
+}
+
+// Log user activity
+function logUserActivity($user_id, $action, $ip = null) {
+    $db = getDB();
+    $ip = $ip ?? $_SERVER['REMOTE_ADDR'];
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    
+    $db->insert(
+        "INSERT INTO user_logs (user_id, action, ip_address, user_agent) VALUES (?, ?, ?, ?)",
+        [$user_id, $action, $ip, $user_agent]
+    );
+}
+
+// Remember me functionality
+function setRememberMe($user_id) {
+    $token = bin2hex(random_bytes(32));
+    $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+    
+    $db = getDB();
+    $db->insert(
+        "INSERT INTO user_sessions (user_id, session_token, expires_at, ip_address, user_agent) VALUES (?, ?, ?, ?, ?)",
+        [$user_id, $token, $expires, $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']]
+    );
+    
+    setcookie('remember_token', $token, strtotime('+30 days'), '/', '', false, true);
+}
+
+// Check remember me
+function checkRememberMe() {
+    if (isset($_COOKIE['remember_token'])) {
+        $db = getDB();
+        $session = $db->getSingle(
+            "SELECT user_id FROM user_sessions WHERE session_token = ? AND expires_at > NOW()",
+            [$_COOKIE['remember_token']]
+        );
         
-        if ($diff < 60) {
-            return 'just now';
-        } elseif ($diff < 3600) {
-            $mins = floor($diff / 60);
-            return $mins . ' minute' . ($mins > 1 ? 's' : '') . ' ago';
-        } elseif ($diff < 86400) {
-            $hours = floor($diff / 3600);
-            return $hours . ' hour' . ($hours > 1 ? 's' : '') . ' ago';
-        } elseif ($diff < 2592000) {
-            $days = floor($diff / 86400);
-            return $days . ' day' . ($days > 1 ? 's' : '') . ' ago';
-        } else {
-            return formatDate($datetime);
+        if ($session) {
+            $_SESSION['user_id'] = $session['user_id'];
+            return true;
         }
     }
-}
-
-// File upload function
-if (!function_exists('uploadFile')) {
-    function uploadFile($file, $targetDir, $allowedTypes = null) {
-        if ($allowedTypes === null) {
-            $allowedTypes = ALLOWED_EXTENSIONS;
-        }
-        
-        $targetDir = UPLOAD_PATH . $targetDir . '/';
-        
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        
-        $fileName = time() . '_' . basename($file['name']);
-        $targetFile = $targetDir . $fileName;
-        $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-        
-        // Check file size
-        if ($file['size'] > MAX_FILE_SIZE) {
-            return ['success' => false, 'message' => 'File too large'];
-        }
-        
-        // Allow certain file formats
-        if (!in_array($fileType, $allowedTypes)) {
-            return ['success' => false, 'message' => 'File type not allowed'];
-        }
-        
-        if (move_uploaded_file($file['tmp_name'], $targetFile)) {
-            return ['success' => true, 'filename' => $fileName];
-        }
-        
-        return ['success' => false, 'message' => 'Upload failed'];
-    }
-}
-
-// Generate random string
-if (!function_exists('generateRandomString')) {
-    function generateRandomString($length = 10) {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $index = rand(0, strlen($characters) - 1);
-            $randomString .= $characters[$index];
-        }
-        return $randomString;
-    }
-}
-
-// Get user IP
-if (!function_exists('getUserIP')) {
-    function getUserIP() {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            return $_SERVER['REMOTE_ADDR'];
-        }
-    }
-}
-
-// Log activity (uses insert() from db.php)
-if (!function_exists('logActivity')) {
-    function logActivity($userId, $action, $details = null) {
-        $ip = getUserIP();
-        $data = [
-            'user_id' => $userId,
-            'action' => $action,
-            'details' => $details,
-            'ip_address' => $ip,
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-        return insert('activity_logs', $data); // This uses insert() from db.php
-    }
-}
-
-// Get user by ID
-if (!function_exists('getUserById')) {
-    function getUserById($id) {
-        return fetchOne("SELECT * FROM users WHERE id = " . intval($id)); // Uses fetchOne() from db.php
-    }
-}
-
-// Debug function
-if (!function_exists('debug')) {
-    function debug($data) {
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-        exit();
-    }
-}
-
-// Check if table exists
-if (!function_exists('tableExists')) {
-    function tableExists($tableName) {
-        global $conn;
-        $result = mysqli_query($conn, "SHOW TABLES LIKE '$tableName'");
-        return mysqli_num_rows($result) > 0;
-    }
-}
-
-// Get settings value
-if (!function_exists('getSetting')) {
-    function getSetting($key, $default = '') {
-        $result = fetchOne("SELECT setting_value FROM settings WHERE setting_key = '$key'");
-        return $result ? $result['setting_value'] : $default;
-    }
+    return false;
 }
 ?>
