@@ -1,4 +1,4 @@
-# Email Verification Setup Guide
+# Email Verification Setup 
 
 ## Overview
 This guide explains how to set up and use the email verification feature for the Mentora application.
