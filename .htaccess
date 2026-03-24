@@ -24,16 +24,16 @@ RewriteEngine On
 # URL REWRITING - SEO FRIENDLY URLs
 # ============================================
 
-# Remove .php extension
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php [L]
+# NOTE: Disabled due to folder with spaces causing issues
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME}\.php -f
+# RewriteRule ^(.*)$ $1.php [L]
 
 # Custom URLs
-RewriteRule ^mentor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/mentor-profile.php?id=$1 [L,QSA]
-RewriteRule ^doctor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/doctor-profile.php?id=$1 [L,QSA]
-RewriteRule ^article/([0-9]+)/([a-zA-Z0-9-]+)$ pages/blog-single.php?id=$1 [L,QSA]
-RewriteRule ^forum/([0-9]+)/([a-zA-Z0-9-]+)$ pages/forum-topic.php?id=$1 [L,QSA]
+# RewriteRule ^mentor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/mentor-profile.php?id=$1 [L,QSA]
+# RewriteRule ^doctor/([0-9]+)/([a-zA-Z0-9-]+)$ pages/doctor-profile.php?id=$1 [L,QSA]
+# RewriteRule ^article/([0-9]+)/([a-zA-Z0-9-]+)$ pages/blog-single.php?id=$1 [L,QSA]
+# RewriteRule ^forum/([0-9]+)/([a-zA-Z0-9-]+)$ pages/forum-topic.php?id=$1 [L,QSA]
 
 # ============================================
 # REDIRECT RULES

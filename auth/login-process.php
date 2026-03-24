@@ -41,7 +41,7 @@ if ($result->num_rows == 1) {
     $update->bind_param("si", $ip, $user['id']);
     $update->execute();
 
-    header("Location: ../dashboard/");
+    header("Location: ../dashboard/index.php");
     exit();
 } else {
     header("Location: login.php?error=Invalid credentials");
