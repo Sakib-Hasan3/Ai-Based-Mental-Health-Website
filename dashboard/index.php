@@ -14,6 +14,28 @@ $user_name = $_SESSION['user_name'] ?? 'User';
 $user_email = $_SESSION['user_email'] ?? 'user@example.com';
 $user_type = $_SESSION['user_type'] ?? 'user';
 $user_id = $_SESSION['user_id'];
+
+// Database connection for profile image
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$dbname = 'mentora_db';
+
+$conn = new mysqli($host, $user, $pass, $dbname);
+$profile_image = 'default-avatar.svg';
+
+if (!$conn->connect_error) {
+    $sql = "SELECT profile_image FROM users WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $profile_image = $row['profile_image'] ?? 'default-avatar.svg';
+    }
+    $stmt->close();
+    $conn->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="bn">
@@ -870,7 +892,7 @@ $user_id = $_SESSION['user_id'];
             
             <div class="user-info">
                 <div class="user-avatar">
-                    <img src="../assets/images/avatars/default-avatar.png" alt="User">
+                    <img src="../assets/images/avatars/<?php echo htmlspecialchars($profile_image); ?>" alt="User">
                 </div>
                 <div class="user-name"><?php echo htmlspecialchars($user_name); ?></div>
                 <div class="user-email"><?php echo htmlspecialchars($user_email); ?></div>
@@ -940,6 +962,12 @@ $user_id = $_SESSION['user_id'];
                         <i class="fas fa-trophy"></i>
                         <span>অ্যাচিভমেন্ট</span>
                         <span class="badge">5</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="assessment.php" class="nav-link">
+                        <i class="fas fa-brain"></i>
+                        <span>মানসিক যাচাই</span>
                     </a>
                 </li>
                 <li class="nav-item">

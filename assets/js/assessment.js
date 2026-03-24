@@ -6,9 +6,6 @@ let factorsChart = null;
 $(document).ready(function() {
     console.log("✅ Assessment JS loaded");
     
-    // Initialize form with Bengali placeholders
-    initializeForm();
-    
     // Form submission
     $('#assessmentForm').on('submit', function(e) {
         e.preventDefault();
@@ -19,12 +16,10 @@ $(document).ready(function() {
     $('#downloadReport').click(function() {
         downloadPDF();
     });
+    
+    // Load history
+    loadHistory();
 });
-
-// Initialize form with sample data
-function initializeForm() {
-    // You can set default values if needed
-}
 
 // Submit assessment
 function submitAssessment() {
@@ -64,18 +59,10 @@ function submitAssessment() {
         dataType: 'json',
         success: function(response) {
             if (response.success) {
-                // Display results
                 displayResults(response.data);
-                
-                // Save to history
-                saveToHistory(response.data);
-                
-                // Scroll to results
-                $('html, body').animate({
-                    scrollTop: $('#resultsSection').offset().top - 100
-                }, 500);
+                scrollToResults();
             } else {
-                alert('Error: ' + response.message);
+                alert('ত্রুটি: ' + response.message);
             }
         },
         error: function(xhr, status, error) {
@@ -123,6 +110,8 @@ function displayResults(data) {
     
     // Update recommendations
     updateRecommendations(data);
+    
+    // Save to history (already saved in backend)
 }
 
 // Update gauge meter
@@ -297,7 +286,7 @@ function updateRecommendations(data) {
                     <li><i class="fas fa-comments"></i> কাউন্সেলরের সাথে কথা বলুন</li>
                     <li><i class="fas fa-spa"></i> প্রতিদিন ১৫ মিনিট মেডিটেশন করুন</li>
                     <li><i class="fas fa-walking"></i> নিয়মিত হাঁটাহাঁটি করুন</li>
-                    <li><i class="fas fa-journal"></i> জার্নাল লিখুন</li>
+                    <li><i class="fas fa-journal-whills"></i> জার্নাল লিখুন</li>
                     <li><i class="fas fa-users"></i> সাপোর্ট গ্রুপে যোগ দিন</li>
                 </ul>
             </div>
@@ -328,21 +317,6 @@ function updateRecommendations(data) {
     $('#recommendations').html(html);
 }
 
-// Save to history
-function saveToHistory(data) {
-    $.ajax({
-        url: '../api/save-assessment.php',
-        type: 'POST',
-        data: JSON.stringify(data),
-        contentType: 'application/json',
-        success: function(response) {
-            if (response.success) {
-                loadHistory();
-            }
-        }
-    });
-}
-
 // Load history
 function loadHistory() {
     $.ajax({
@@ -359,39 +333,57 @@ function loadHistory() {
 // Display history table
 function displayHistory(history) {
     let html = '';
-    history.forEach(item => {
-        let riskClass = '';
-        if (item.risk_level === 'Low') riskClass = 'low';
-        else if (item.risk_level === 'Moderate') riskClass = 'moderate';
-        else riskClass = 'high';
-        
-        html += `
-            <tr>
-                <td>${item.assessment_date}</td>
-                <td><span class="risk-badge ${riskClass}">${item.risk_level}</span></td>
-                <td>${item.risk_percentage}%</td>
-                <td>${item.prediction_result === 'Yes' ? 'চিকিৎসা প্রয়োজন' : 'চিকিৎসা প্রয়োজন নেই'}</td>
-                <td><button class="btn-download" onclick="viewReport(${item.id})"><i class="fas fa-eye"></i> দেখুন</button></td>
-            </tr>
-        `;
-    });
-    
+    if (history.length === 0) {
+        html = '<tr><td colspan="5" style="text-align: center;">কোনো পূর্বের অ্যাসেসমেন্ট নেই</td></tr>';
+    } else {
+        history.forEach(item => {
+            let riskClass = '';
+            if (item.prediction_band === 'Low Risk') riskClass = 'low';
+            else if (item.prediction_band === 'Moderate Risk') riskClass = 'moderate';
+            else riskClass = 'high';
+            
+            html += `
+                <tr>
+                    <td>${item.created_at}</td>
+                    <td><span class="risk-badge ${riskClass}">${item.prediction_band}</span></td>
+                    <td>${item.risk_percentage}%</td>
+                    <td>${item.prediction_label === 'Yes' ? 'চিকিৎসা প্রয়োজন' : 'চিকিৎসা প্রয়োজন নেই'}</td>
+                    <td><button class="btn-download" onclick="viewReport(${item.id})" style="padding: 5px 12px;"><i class="fas fa-eye"></i> দেখুন</button></td>
+                </tr>
+            `;
+        });
+    }
     $('#historyBody').html(html);
-}
-
-// Download PDF report
-function downloadPDF() {
-    // This would use a library like jsPDF
-    alert('PDF ডাউনলোড করা হবে');
 }
 
 // View specific report
 function viewReport(id) {
-    // Load and display specific assessment
-    console.log('View report:', id);
+    $.ajax({
+        url: '../api/get-report.php',
+        type: 'POST',
+        data: JSON.stringify({ id: id }),
+        contentType: 'application/json',
+        success: function(response) {
+            if (response.success) {
+                displayResults(response.data);
+                scrollToResults();
+                showMessage('success', 'পূর্বের রিপোর্ট লোড করা হয়েছে');
+            }
+        }
+    });
 }
 
-// Helper function to get Bengali names
+// Download PDF report
+function downloadPDF() {
+    // Get current results data from DOM
+    const riskLevel = $('#riskLevel').text();
+    const riskPercentage = $('#gaugePercentage').text();
+    
+    // You can implement PDF generation here
+    alert('PDF রিপোর্ট ডাউনলোড করা হবে। এই ফিচারটি শীঘ্রই আসছে!');
+}
+
+// Helper functions
 function getBengaliName(englishName) {
     const names = {
         'family_history': 'পারিবারিক ইতিহাস',
@@ -400,13 +392,35 @@ function getBengaliName(englishName) {
         'growing_stress': 'বর্ধমান চাপ',
         'work_interest': 'কাজে আগ্রহ',
         'social_weakness': 'সামাজিক দুর্বলতা',
-        'Days_Indoors': 'গৃহে অবস্থান',
-        'Mental_Health_History': 'মানসিক স্বাস্থ্যের ইতিহাস'
+        'days_indoors': 'গৃহে অবস্থান',
+        'mental_health_history': 'মানসিক স্বাস্থ্যের ইতিহাস',
+        'changes_habits': 'অভ্যাস পরিবর্তন',
+        'care_options': 'চিকিৎসা সুবিধা'
     };
     return names[englishName] || englishName;
 }
 
-// Load history on page load
-$(document).ready(function() {
-    loadHistory();
-});
+function scrollToResults() {
+    $('html, body').animate({
+        scrollTop: $('#resultsSection').offset().top - 100
+    }, 500);
+}
+
+function showMessage(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    
+    const alertHtml = `
+        <div class="alert ${alertClass}" style="margin-bottom: 20px; padding: 12px; border-radius: 12px;">
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+            <button onclick="$(this).parent().remove()" style="margin-left: auto; background: none; border: none; font-size: 16px; cursor: pointer;">&times;</button>
+        </div>
+    `;
+    
+    $('#resultsSection').prepend(alertHtml);
+    
+    setTimeout(() => {
+        $('.alert').fadeOut('slow', function() { $(this).remove(); });
+    }, 5000);
+}

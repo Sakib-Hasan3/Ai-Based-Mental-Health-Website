@@ -1,117 +1,143 @@
 /* assets/css/assessment.css */
-
 :root {
     --primary: #6366f1;
     --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --secondary: #0d9488;
     --success: #10b981;
-    --warning: #f59e0b;
     --danger: #ef4444;
-    --dark: #1f2937;
-    --light: #f9fafb;
+    --warning: #f59e0b;
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
 }
 
-/* ==================== Assessment Container ==================== */
+/* Assessment Container */
 .assessment-container {
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 20px;
 }
 
-/* ==================== Form Card ==================== */
-.assessment-card {
+/* Assessment Hero */
+.assessment-hero {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 30px;
-    padding: 30px;
+    padding: 40px;
     margin-bottom: 30px;
     color: white;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
-.assessment-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
+.assessment-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    animation: rotate 30s linear infinite;
 }
 
-.assessment-icon {
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-.assessment-title h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 5px;
+.assessment-hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
 }
 
-.assessment-title p {
-    opacity: 0.9;
-    font-size: 14px;
-}
-
-/* ==================== Form Grid ==================== */
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    margin-top: 20px;
-}
-
-.form-group {
+.assessment-hero h1 {
+    font-size: 36px;
+    font-weight: 800;
     margin-bottom: 15px;
 }
 
-.form-label {
+.assessment-hero p {
+    font-size: 16px;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Assessment Form Card */
+.assessment-card {
+    background: white;
+    border-radius: 30px;
+    padding: 35px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.form-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
     display: block;
     margin-bottom: 8px;
-    color: var(--dark);
     font-weight: 600;
+    color: var(--gray-700);
     font-size: 14px;
 }
 
-.form-label i {
+.form-group label i {
     color: var(--primary);
     margin-right: 8px;
-}
-
-.bn-label {
-    display: block;
-    font-size: 12px;
-    color: #6b7280;
-    margin-top: 2px;
+    width: 20px;
 }
 
 .form-select {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     border-radius: 12px;
     font-size: 14px;
     transition: all 0.3s ease;
     background: white;
     cursor: pointer;
+    font-family: inherit;
 }
 
 .form-select:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
 }
 
-/* ==================== Submit Button ==================== */
+/* Submit Button */
 .btn-assess {
     background: linear-gradient(135deg, var(--success), #059669);
     color: white;
     border: none;
-    padding: 16px 30px;
+    padding: 16px 35px;
     border-radius: 50px;
     font-size: 18px;
     font-weight: 600;
@@ -123,12 +149,12 @@
     gap: 10px;
     width: 100%;
     margin-top: 20px;
-    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 10px 20px rgba(16,185,129,0.3);
 }
 
 .btn-assess:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(16,185,129,0.4);
 }
 
 .btn-assess:disabled {
@@ -147,14 +173,29 @@
     animation: spin 1s ease-in-out infinite;
 }
 
-/* ==================== Results Section ==================== */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Results Section */
 .results-section {
     display: none;
-    animation: fadeIn 0.5s ease;
+    animation: fadeInUp 0.5s ease;
 }
 
 .results-section.visible {
     display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .results-header {
@@ -162,26 +203,48 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
-.results-header h3 {
-    font-size: 22px;
-    color: var(--dark);
+.results-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-800);
 }
 
-/* ==================== Gauge Meter ==================== */
+.btn-download {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-download:hover {
+    background: var(--gray-200);
+}
+
+/* Gauge Container */
 .gauge-container {
     background: white;
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 24px;
+    padding: 30px;
     margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .gauge-title {
     font-size: 16px;
-    color: var(--dark);
+    color: var(--gray-600);
     margin-bottom: 20px;
 }
 
@@ -196,9 +259,7 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: conic-gradient(var(--success) 0deg, var(--warning) 180deg, var(--danger) 360deg);
-    mask: radial-gradient(circle at center, transparent 60%, black 61%);
-    -webkit-mask: radial-gradient(circle at center, transparent 60%, black 61%);
+    transition: all 1s ease;
 }
 
 .gauge-value {
@@ -207,7 +268,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 36px;
-    font-weight: 700;
+    font-weight: 800;
+    color: var(--gray-800);
 }
 
 .gauge-label {
@@ -222,25 +284,26 @@
 .gauge-label.moderate { background: #fed7aa; color: #92400e; }
 .gauge-label.high { background: #fee2e2; color: #991b1b; }
 
-/* ==================== Charts Grid ==================== */
+/* Charts Grid */
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 25px;
     margin-bottom: 25px;
 }
 
 .chart-card {
     background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .chart-card h4 {
     font-size: 16px;
-    color: var(--dark);
-    margin-bottom: 15px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -251,35 +314,35 @@
     position: relative;
 }
 
-/* ==================== Risk Factors ==================== */
+/* Factors List */
 .factors-list {
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .factor-item {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .factor-name {
     width: 120px;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray-600);
 }
 
 .factor-bar {
     flex: 1;
     height: 8px;
-    background: #e5e7eb;
+    background: var(--gray-200);
     border-radius: 4px;
     overflow: hidden;
 }
 
 .factor-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
     border-radius: 4px;
     width: 0%;
     transition: width 1s ease;
@@ -289,17 +352,17 @@
     width: 50px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--dark);
+    color: var(--gray-700);
 }
 
-/* ==================== Recommendations ==================== */
+/* Recommendations Card */
 .recommendation-card {
     background: white;
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 24px;
+    padding: 30px;
     margin-bottom: 25px;
     border-left: 8px solid transparent;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .recommendation-card.low { border-left-color: var(--success); }
@@ -307,18 +370,18 @@
 .recommendation-card.high { border-left-color: var(--danger); }
 
 .recommendation-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .recommendation-text {
-    color: #4b5563;
+    color: var(--gray-600);
     line-height: 1.6;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .tips-list {
@@ -331,7 +394,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #4b5563;
+    color: var(--gray-600);
 }
 
 .tips-list i {
@@ -342,26 +405,34 @@
 .helpline {
     background: #fee2e2;
     border: 2px solid #ef4444;
-    border-radius: 50px;
-    padding: 15px 20px;
-    margin-top: 15px;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
     text-align: center;
     animation: pulse 2s infinite;
 }
 
-.helpline-number {
-    font-size: 24px;
-    font-weight: 700;
-    color: #dc2626;
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
 }
 
-/* ==================== History Table ==================== */
+.helpline-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: #dc2626;
+    margin-top: 8px;
+    display: block;
+}
+
+/* History Section */
 .history-section {
     background: white;
-    border-radius: 20px;
-    padding: 25px;
+    border-radius: 24px;
+    padding: 30px;
     margin-top: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .history-header {
@@ -369,6 +440,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .history-table {
@@ -379,21 +452,21 @@
 .history-table th {
     text-align: left;
     padding: 12px;
-    background: #f9fafb;
-    color: #374151;
+    background: var(--gray-100);
+    color: var(--gray-700);
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .history-table td {
     padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
-    font-size: 14px;
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 13px;
 }
 
 .risk-badge {
     padding: 4px 12px;
-    border-radius: 50px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     display: inline-block;
@@ -403,56 +476,12 @@
 .risk-badge.moderate { background: #fed7aa; color: #92400e; }
 .risk-badge.high { background: #fee2e2; color: #991b1b; }
 
-.btn-download {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-download:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-/* ==================== Animations ==================== */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-    }
-}
-
-/* ==================== Responsive ==================== */
+/* Responsive */
 @media (max-width: 768px) {
+    .assessment-hero h1 {
+        font-size: 28px;
+    }
+    
     .assessment-card {
         padding: 20px;
     }
@@ -468,5 +497,14 @@
     .history-table {
         display: block;
         overflow-x: auto;
+    }
+    
+    .gauge-wrapper {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .gauge-value {
+        font-size: 28px;
     }
 }
