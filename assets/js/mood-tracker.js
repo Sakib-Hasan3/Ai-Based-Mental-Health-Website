@@ -6,9 +6,17 @@ let currentPeriod = 'week';
 $(document).ready(function() {
     console.log("✅ Mood Tracker loaded");
     
+    // Verify elements exist
+    console.log("🔍 Element check:");
+    console.log("  - Mood cards:", $('.mood-card').length);
+    console.log("  - Date input:", $('#moodDate').length);
+    console.log("  - Save button:", $('#saveMoodBtn').length);
+    console.log("  - Checkboxes:", $('#exercise').length + $('#meditation').length + $('#socialContact').length);
+    
     // Set today's date
     const today = new Date().toISOString().split('T')[0];
     $('#moodDate').val(today);
+    console.log("📅 Today's date set to:", today);
     
     // Load existing data for today
     loadMoodData(today);
@@ -34,12 +42,15 @@ $(document).ready(function() {
     
     // Mood selection
     $('.mood-card').click(function() {
+        console.log("🎯 Mood card clicked");
         $('.mood-card').removeClass('selected');
         $(this).addClass('selected');
         
         const moodScore = $(this).data('score');
         const moodLabel = $(this).data('label');
         const moodEmoji = $(this).data('emoji');
+        
+        console.log("✅ Selected mood:", {score: moodScore, label: moodLabel, emoji: moodEmoji});
         
         $('#selectedMoodScore').val(moodScore);
         $('#selectedMoodLabel').val(moodLabel);
@@ -55,8 +66,11 @@ $(document).ready(function() {
     });
     
     // Save mood
-    $('#saveMoodBtn').click(function() {
+    $('#saveMoodBtn').click(function(e) {
+        e.preventDefault();
+        console.log("💾 Save button clicked!");
         saveMood();
+        return false;
     });
     
     // Enter key in notes
@@ -136,6 +150,8 @@ function saveMood() {
         entry_date: $('#moodDate').val()
     };
     
+    console.log("📤 Saving mood:", moodData);
+    
     // Show loading
     const $btn = $('#saveMoodBtn');
     $btn.html('<span class="spinner"></span> সংরক্ষণ করা হচ্ছে...').prop('disabled', true);
@@ -146,7 +162,9 @@ function saveMood() {
         data: JSON.stringify(moodData),
         contentType: 'application/json',
         dataType: 'json',
+        timeout: 10000,
         success: function(response) {
+            console.log("✅ Save response:", response);
             if (response.success) {
                 showMessage('success', response.message);
                 // Reload chart and history
@@ -156,8 +174,10 @@ function saveMood() {
                 showMessage('error', response.message);
             }
         },
-        error: function() {
-            showMessage('error', 'সার্ভারে সমস্যা হয়েছে');
+        error: function(xhr, status, error) {
+            console.error("❌ Save error:", status, error);
+            console.error("Response text:", xhr.responseText);
+            showMessage('error', 'সার্ভারে সমস্যা হয়েছে: ' + error);
         },
         complete: function() {
             $btn.html('<i class="fas fa-save"></i> মুড সংরক্ষণ করুন').prop('disabled', false);

@@ -82,7 +82,7 @@ $stmt->close();
 $conn->close();
 
 // Default values
-$profile_image = $user_data['profile_image'] ?? 'default-avatar.png';
+$profile_image = $user_data['profile_image'] ?? 'default-avatar.svg';
 $full_name = $user_data['full_name'] ?? '';
 $email = $user_data['email'] ?? '';
 $phone = $user_data['phone'] ?? '';

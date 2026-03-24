@@ -20,7 +20,7 @@ $pass = '';
 $dbname = 'mentora_db';
 
 $conn = new mysqli($host, $user, $pass, $dbname);
-$profile_image = 'default-avatar.png';
+$profile_image = 'default-avatar.svg';
 
 if (!$conn->connect_error) {
     $sql = "SELECT profile_image FROM users WHERE id = ?";
@@ -29,7 +29,7 @@ if (!$conn->connect_error) {
     $stmt->execute();
     $result = $stmt->get_result();
     if ($row = $result->fetch_assoc()) {
-        $profile_image = $row['profile_image'] ?? 'default-avatar.png';
+        $profile_image = $row['profile_image'] ?? 'default-avatar.svg';
     }
     $stmt->close();
     $conn->close();
