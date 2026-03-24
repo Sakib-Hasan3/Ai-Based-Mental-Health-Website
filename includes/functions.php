@@ -1,6 +1,7 @@
 <?php
 // includes/functions.php
 session_start();
+require_once __DIR__ . '/../config/database.php';
 
 // Get database instance
 function getDB() {
@@ -251,6 +252,93 @@ function verifyEmailToken($token) {
     } catch (Exception $e) {
         error_log("Email verification error: " . $e->getMessage());
         return ['success' => false, 'message' => 'যাচাইকরণ ব্যর্থ হয়েছে'];
+    }
+}
+
+// =============== REMEMBER ME FUNCTIONS ===============
+
+// Set remember me cookie
+function setRememberMe($user_id) {
+    try {
+        $db = getDB();
+        $token = bin2hex(random_bytes(32));
+        $expire_date = date('Y-m-d H:i:s', strtotime('+30 days'));
+        
+        // Store token in remember_tokens table
+        $conn = $db->getConnection();
+        
+        // Create table if not exists
+        $create_sql = "CREATE TABLE IF NOT EXISTS remember_tokens (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            user_id INT NOT NULL,
+            token VARCHAR(64) NOT NULL UNIQUE,
+            expires_at DATETIME NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_user_token (user_id, token),
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+        
+        $conn->query($create_sql);
+        
+        // Insert token
+        $insert_sql = "INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)";
+        $db->insert($insert_sql, [$user_id, $token, $expire_date]);
+        
+        // Set cookie
+        $cookie_expire = time() + (30 * 24 * 60 * 60); // 30 days
+        setcookie('remember_token', $token, $cookie_expire, '/', '', false, true);
+        
+        return true;
+    } catch (Exception $e) {
+        error_log("Remember Me Error: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Get user from remember token
+function getRememberMeUser() {
+    try {
+        if (!isset($_COOKIE['remember_token'])) {
+            return null;
+        }
+        
+        $token = $_COOKIE['remember_token'];
+        $db = getDB();
+        
+        // Check if token is valid and not expired
+        $sql = "SELECT user_id FROM remember_tokens 
+                WHERE token = ? AND expires_at > NOW()";
+        
+        $result = $db->getSingle($sql, [$token]);
+        
+        if ($result && isset($result['user_id'])) {
+            return $db->getSingle(
+                "SELECT id, full_name, email, user_type FROM users WHERE id = ?",
+                [$result['user_id']]
+            );
+        }
+        
+        return null;
+    } catch (Exception $e) {
+        error_log("Remember Me Fetch Error: " . $e->getMessage());
+        return null;
+    }
+}
+
+// Clear remember me token
+function clearRememberMe() {
+    try {
+        if (isset($_COOKIE['remember_token'])) {
+            $token = $_COOKIE['remember_token'];
+            $db = getDB();
+            
+            $sql = "DELETE FROM remember_tokens WHERE token = ?";
+            $db->insert($sql, [$token]);
+            
+            setcookie('remember_token', '', time() - 3600, '/');
+        }
+    } catch (Exception $e) {
+        error_log("Clear Remember Me Error: " . $e->getMessage());
     }
 }
 ?>

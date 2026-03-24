@@ -1,12 +1,19 @@
+<?php
+// index.php - Fixed for folder with space
+session_start();
+
+// Get the correct base path
+$base_path = '/mental%20health/';  // স্পেস এনকোডেড
+?>
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>মেন্টোরা · বাংলায় মানসিক স্বাস্থ্য</title>
-    <!-- Font Awesome 6 (free) -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts: Noto Sans Bengali + fallback -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +35,6 @@
             line-height: 1.6;
         }
 
-        /* bengali friendly spacing */
         h1, h2, h3 {
             font-weight: 700;
             line-height: 1.4;
@@ -65,14 +71,14 @@
 
         .logo i {
             font-size: 28px;
-            color: #0d9488; /* teal-600 */
+            color: #0d9488;
         }
 
         .logo span {
             font-size: 26px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            color: #115e59; /* deeper teal */
+            color: #115e59;
         }
 
         .logo span small {
@@ -86,6 +92,7 @@
             display: flex;
             gap: 32px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .nav-links a {
@@ -101,26 +108,6 @@
         .nav-links a:hover {
             color: #0f766e;
             border-bottom-color: #14b8a6;
-        }
-
-        .btn {
-            background: #14b8a6;
-            color: white !important;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-block;
-            text-decoration: none;
-            border-bottom: none !important;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #14b8a6;
-            color: #115e59 !important;
         }
 
         .auth-buttons {
@@ -168,7 +155,25 @@
             background: #0f766e;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
-            color: white;
+        }
+
+        .btn {
+            background: #14b8a6;
+            color: white !important;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #14b8a6;
+            color: #115e59 !important;
         }
 
         .btn:hover {
@@ -239,7 +244,6 @@
             min-height: 300px;
         }
 
-        /* features / services */
         .section-title {
             text-align: center;
             margin: 50px 0 30px;
@@ -295,22 +299,16 @@
             font-size: 16px;
         }
 
-        /* Steps Grid */
         .steps-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 40px;
             margin: 50px auto;
             max-width: 1000px;
-            width: 100%;
-            justify-items: center;
-            align-items: start;
         }
 
         .step-card {
             text-align: center;
-            width: 100%;
-            max-width: 280px;
         }
 
         .step-number {
@@ -340,7 +338,6 @@
             line-height: 1.6;
         }
 
-        /* PSTU section */
         .pstu-highlight {
             background: #e6fffa;
             border-radius: 60px;
@@ -364,13 +361,18 @@
             gap: 10px;
         }
 
-        .pstu-content h3 i {
-            font-size: 40px;
+        .pstu-map {
+            flex: 1 1 200px;
+            background: #d9f2ee;
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            color: #0b4f4a;
         }
 
-        .pstu-content p {
-            font-size: 18px;
-            margin: 20px 0 10px;
+        .pstu-map i {
+            font-size: 70px;
+            opacity: 0.9;
         }
 
         .pill-group {
@@ -389,21 +391,6 @@
             border: 1px solid #5eead4;
         }
 
-        .pstu-map {
-            flex: 1 1 200px;
-            background: #d9f2ee;
-            border-radius: 40px;
-            padding: 30px;
-            text-align: center;
-            color: #0b4f4a;
-        }
-
-        .pstu-map i {
-            font-size: 70px;
-            opacity: 0.9;
-        }
-
-        /* experts */
         .experts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -433,7 +420,6 @@
             color: #115e59;
         }
 
-        /* testimonials */
         .testimonial {
             background: white;
             border-radius: 40px;
@@ -468,7 +454,6 @@
             font-size: 22px;
         }
 
-        /* CTA */
         .cta-section {
             background: linear-gradient(130deg, #115e59, #0d9488);
             border-radius: 50px;
@@ -491,7 +476,6 @@
             margin-top: 20px;
         }
 
-        /* footer */
         .footer {
             background: #0f172a;
             color: #cbd5e1;
@@ -531,11 +515,6 @@
             color: #94a3b8;
         }
 
-        /* bengali adjustments */
-        .bn {
-            word-break: normal;
-        }
-
         @media (max-width: 700px) {
             .nav-container {
                 flex-direction: column;
@@ -547,24 +526,14 @@
             .auth-buttons {
                 width: 100%;
                 justify-content: center;
-                gap: 8px;
-            }
-            .btn-login,
-            .btn-signup {
-                padding: 8px 16px;
-                font-size: 14px;
             }
             .steps-grid {
                 grid-template-columns: 1fr;
-                gap: 30px;
             }
             .step-number {
                 width: 80px;
                 height: 80px;
                 font-size: 36px;
-            }
-            .step-card h3 {
-                font-size: 20px;
             }
         }
     </style>
@@ -581,37 +550,34 @@
         <div class="nav-links">
             <a href="#home">মূলপাতা</a>
             <a href="#services">সেবাসমূহ</a>
-            <a href="auth/login.php">বিশেষজ্ঞ</a>
-            <a href="auth/login.php">ব্লগ</a>
-            <a href="auth/login.php">যোগাযোগ</a>
-        
+            <a href="<?php echo $base_path; ?>auth/login.php">বিশেষজ্ঞ</a>
+            <a href="<?php echo $base_path; ?>auth/login.php">ব্লগ</a>
+            <a href="<?php echo $base_path; ?>auth/login.php">যোগাযোগ</a>
         </div>
         <div class="auth-buttons">
-            <a href="auth/login.php" class="btn-login">লগইন</a>
-            <a href="auth/register.php" class="btn-signup">সাইন আপ</a>
+            <a href="<?php echo $base_path; ?>auth/login.php" class="btn-login">লগইন</a>
+            <a href="<?php echo $base_path; ?>auth/register.php" class="btn-signup">সাইন আপ</a>
         </div>
     </div>
 </header>
 
-<!-- ======== Hero / প্রধান অংশ ======== -->
-<section class="hero">
+<!-- Hero Section -->
+<section class="hero" id="home">
     <div class="container hero-grid">
         <div class="hero-content">
-            <span class="hero-badge"><i class="fas fa-brain" style="margin-right: 6px;"></i> বাংলাদেশের প্রথম AI মানসিক স্বাস্থ্য প্ল্যাটফর্ম</span>
+            <span class="hero-badge"><i class="fas fa-brain"></i> বাংলাদেশের প্রথম AI মানসিক স্বাস্থ্য প্ল্যাটফর্ম</span>
             <h1>আপনার মানসিক সুস্থতার <span class="hero-highlight">বিশ্বস্ত সঙ্গী</span></h1>
             <p>AI চ্যাটবট, বিশেষজ্ঞ মেন্টর এবং আত্ম-উন্নয়ন কোর্সের মাধ্যমে আপনার মানসিক স্বাস্থ্যের যত্ন নিন — সম্পূর্ণ বাংলায়, সম্পূর্ণ গোপনীয়।</p>
             <div class="hero-buttons">
-                <a href="auth/login.php" class="btn">মন খুলে বলুন <i class="fas fa-arrow-right"></i></a>
+                <a href="<?php echo $base_path; ?>auth/login.php" class="btn">মন খুলে বলুন <i class="fas fa-arrow-right"></i></a>
                 <a href="#services" class="btn-outline btn">আমাদের সম্পর্কে</a>
             </div>
         </div>
-        <div class="hero-image">
-            <!-- pure css abstract art / bengali wellbeing -->
-        </div>
+        <div class="hero-image"></div>
     </div>
 </section>
 
-<!-- ======== বিশেষ সেবা ======== -->
+<!-- Services Section -->
 <div class="container" id="services">
     <div class="section-title">
         <h2>আমাদের সুবিধাসমূহ</h2>
@@ -641,8 +607,8 @@
     </div>
 </div>
 
-<!-- ======== কীভাবে কাজ করে ======== -->
-<div class="container" style="margin: 80px 0;">
+<!-- Steps Section -->
+<div class="container">
     <div class="section-title">
         <h2>কীভাবে কাজ করে?</h2>
         <p>মাত্র তিনটি পদক্ষেপে শুরু করুন আপনার সুস্থতার যাত্রা।</p>
@@ -666,12 +632,12 @@
     </div>
 </div>
 
-<!-- ======== PSTU বিশেষত্ব ======== -->
+<!-- PSTU Section -->
 <div class="container">
     <div class="pstu-highlight">
         <div class="pstu-content">
             <h3><i class="fas fa-university"></i> পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়</h3>
-            <p>মেন্টোরা শুরু হয়েছে  একঝাঁক উদ্যমী শিক্ষার্থীর হাত ধরে। সাইকোলজি ও সিএসই  বিভাগের সম্মিলিত প্রচেষ্টায় তৈরি এই প্ল্যাটফর্ম দেশীয় প্রেক্ষাপটে মানসিক স্বাস্থ্য সচেতনতা বাড়াতে কাজ করছে।</p>
+            <p>মেন্টোরা শুরু হয়েছে একঝাঁক উদ্যমী শিক্ষার্থীর হাত ধরে। সাইকোলজি ও সিএসই বিভাগের সম্মিলিত প্রচেষ্টায় তৈরি এই প্ল্যাটফর্ম দেশীয় প্রেক্ষাপটে মানসিক স্বাস্থ্য সচেতনতা বাড়াতে কাজ করছে।</p>
             <div class="pill-group">
                 <span class="pill"><i class="far fa-check-circle"></i> গবেষণা-সমর্থিত</span>
                 <span class="pill"><i class="far fa-check-circle"></i> দেশীয় বিশেষজ্ঞ</span>
@@ -686,7 +652,7 @@
     </div>
 </div>
 
-<!-- ======== বিশেষজ্ঞ প্যানেল ======== -->
+<!-- Experts Section -->
 <div class="container">
     <div class="section-title">
         <h2>আমাদের উপদেষ্টা ও থেরাপিস্ট</h2>
@@ -701,12 +667,12 @@
         <div class="expert-card">
             <div class="expert-avatar"><i class="fas fa-user-tie"></i></div>
             <h3>অধ্যাপক মোঃ আনিস</h3>
-            <p>সাইকিয়াট্রি, পশুপ</p>
+            <p>সাইকিয়াট্রি</p>
         </div>
         <div class="expert-card">
             <div class="expert-avatar"><i class="fas fa-user-nurse"></i></div>
             <h3>সাদিয়া ইসলাম</h3>
-            <p>কাউন্সেলর ও প্রশিক্ষক</p>
+            <p>কাউন্সেলর</p>
         </div>
         <div class="expert-card">
             <div class="expert-avatar"><i class="fas fa-users"></i></div>
@@ -716,13 +682,11 @@
     </div>
 </div>
 
-<!-- ======== ব্যবহারকারীর মতামত ======== -->
+<!-- Testimonials -->
 <div class="container">
     <div class="testimonial">
         <div class="testimonial-flex">
-            <blockquote>
-                “মেন্টোরার গ্রুপ থেরাপিতে আমি প্রথম বুঝতে পারি আমার অনুভূতি অস্বাভাবিক না। বাংলায়, নিজের ভাষায় এত যত্ন পাওয়া সত্যিই অভাবনীয়। পশুপের ছাত্ররা অসাধারণ কাজ করেছে।”
-            </blockquote>
+            <blockquote>“মেন্টোরার গ্রুপ থেরাপিতে আমি প্রথম বুঝতে পারি আমার অনুভূতি অস্বাভাবিক না। বাংলায়, নিজের ভাষায় এত যত্ন পাওয়া সত্যিই অভাবনীয়।”</blockquote>
             <div class="testimonial-author">
                 <i class="fas fa-user-circle" style="font-size: 60px; color: #14b8a6;"></i>
                 <div class="author-name">তানভীর আনজুম রাহাত</div>
@@ -735,28 +699,26 @@
 <div class="container">
     <div class="testimonial">
         <div class="testimonial-flex">
-            <blockquote>
-                “মেন্টোরার সাহায্যে আমি খুব সহজে আমার ডিপ্রেশন লেভেল কতটুকু প্রেডিক্ট করতে পারি এবং মনের বন্ধু চ্যাটবটের সাথে কথা বলে সাজেশন নিতে পারে”
-            </blockquote>
+            <blockquote>“মেন্টোরার সাহায্যে আমি খুব সহজে আমার ডিপ্রেশন লেভেল কতটুকু প্রেডিক্ট করতে পারি এবং মনের বন্ধু চ্যাটবটের সাথে কথা বলে সাজেশন নিতে পারে”</blockquote>
             <div class="testimonial-author">
                 <i class="fas fa-user-circle" style="font-size: 60px; color: #14b8a6;"></i>
                 <div class="author-name">রাহিনা আকতার</div>
-                <div style="color: #475569;">ঢাকা </div>
+                <div style="color: #475569;">ঢাকা</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ======== Call to action / সরাসরি কথা বলুন ======== -->
+<!-- CTA Section -->
 <div class="container">
     <div class="cta-section">
         <h2>আপনি একা নন, আমরা আছি পাশে</h2>
         <p style="font-size: 20px; max-width: 600px; margin: 0 auto;">বিনামূল্যে প্রথম সেশন বুক করুন অথবা চ্যাট শুরু করুন। সম্পূর্ণ গোপনীয়।</p>
-        <a href="auth/login.php" class="btn">এখনই কথা বলুন <i class="fas fa-arrow-right"></i></a>
+        <a href="<?php echo $base_path; ?>auth/login.php" class="btn">এখনই কথা বলুন <i class="fas fa-arrow-right"></i></a>
     </div>
 </div>
 
-<!-- ======== ফুটার ======== -->
+<!-- Footer -->
 <footer class="footer">
     <div class="container footer-grid">
         <div class="footer-logo">
@@ -785,12 +747,19 @@
     </div>
 </footer>
 
-<!-- optional small js for interactivity (placeholder) -->
 <script>
     (function() {
-        // make buttons smoother, future enhancement
-        console.log("মেন্টোরা — বাংলায় মানসিক স্বাস্থ্য সবার জন্য।");
+        console.log("✅ মেন্টোরা — বাংলায় মানসিক স্বাস্থ্য সবার জন্য।");
+        console.log("🔗 Base path: <?php echo $base_path; ?>");
+        
+        // Check all auth links
+        const links = document.querySelectorAll('a[href*="login"], a[href*="register"]');
+        console.log("📌 Found " + links.length + " auth links:");
+        links.forEach((link, i) => {
+            console.log(`${i}: ${link.href}`);
+        });
     })();
 </script>
+
 </body>
 </html>
