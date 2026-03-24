@@ -28,17 +28,39 @@ FEATURE_ORDER = [
     'care_options_encoded'
 ]
 
-@app.route('/api/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST', 'OPTIONS'])
 def predict():
     """
     Mental Health Prediction API
     Accepts POST request with user data and returns prediction
     """
+    print(f"\n{'='*60}")
+    print(f"📨 INCOMING REQUEST at {pd.Timestamp.now()}")
+    print(f"Method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    print(f"Content-Length: {request.content_length}")
+    print(f"{'='*60}")
+    
+    # Handle OPTIONS request for CORS
+    if request.method == 'OPTIONS':
+        print("✅ CORS preflight request handled")
+        return jsonify({}), 200
+    
     try:
         # JSON ডেটা পান
-        data = request.get_json()
+        data = request.get_json(force=True, silent=True)
+        
+        if data:
+            print(f"✅ JSON data received: {list(data.keys())}")
+            print(f"Data values: {data}")
+        else:
+            print("⚠️ No JSON data, checking form data...")
+            data = request.form.to_dict()
+            if data:
+                print(f"✅ Form data received: {list(data.keys())}")
         
         if not data:
+            print("❌ No data provided")
             return jsonify({'error': 'No data provided'}), 400
         
         # এনকোডিং করুন

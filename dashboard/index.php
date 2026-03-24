@@ -943,6 +943,12 @@ $user_id = $_SESSION['user_id'];
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="assessment.php" class="nav-link">
+                        <i class="fas fa-brain"></i>
+                        <span>মানসিক যাচাই</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="settings.php" class="nav-link">
                         <i class="fas fa-cog"></i>
                         <span>সেটিংস</span>
