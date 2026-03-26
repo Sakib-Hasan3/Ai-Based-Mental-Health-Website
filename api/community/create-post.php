@@ -43,7 +43,7 @@ $stmt->bind_param("issi", $user_id, $content, $category, $is_anonymous);
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'পোস্ট করা হয়েছে']);
 } else {
-    echo json_encode(['success' => false, 'message' => 'পোস্ট করতে ব্যর্থ হয়েছে']);
+    echo json_encode(['success' => false, 'message' => 'পোস্ট করতে ব্যর্থ হয়েছে: ' . $conn->error]);
 }
 
 $stmt->close();
