@@ -110,6 +110,62 @@ $base_path = '/mental%20health/';  // স্পেস এনকোডেড
             border-bottom-color: #14b8a6;
         }
 
+        .nav-dropdown {
+            position: relative;
+        }
+
+        .nav-dropdown > a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 30, 30, 0.12);
+            min-width: 200px;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            display: flex;
+        }
+
+        .dropdown-menu a {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 16px;
+            color: #1e293b;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f0fdfa;
+            color: #0f766e;
+            padding-left: 20px;
+        }
+
+        .dropdown-menu i {
+            color: #14b8a6;
+            font-size: 16px;
+        }
+
         .auth-buttons {
             display: flex;
             gap: 12px;
@@ -550,9 +606,21 @@ $base_path = '/mental%20health/';  // স্পেস এনকোডেড
         <div class="nav-links">
             <a href="#home">মূলপাতা</a>
             <a href="#services">সেবাসমূহ</a>
-            <a href="<?php echo $base_path; ?>auth/login.php">বিশেষজ্ঞ</a>
-            <a href="<?php echo $base_path; ?>auth/login.php">ব্লগ</a>
-            <a href="<?php echo $base_path; ?>auth/login.php">যোগাযোগ</a>
+            <div class="nav-dropdown">
+                <a href="#features">ফিচারস <i class="fas fa-chevron-down"></i></a>
+                <div class="dropdown-menu">
+                    <a href="<?php echo $base_path; ?>dashboard/index.php"><i class="fas fa-home"></i> ড্যাশবোর্ড</a>
+                    <a href="<?php echo $base_path; ?>dashboard/profile.php"><i class="fas fa-user"></i> প্রোফাইল</a>
+                    <a href="<?php echo $base_path; ?>dashboard/chatbot.php"><i class="fas fa-robot"></i> মনের বন্ধু AI</a>
+                    <a href="<?php echo $base_path; ?>dashboard/mood-tracker.php"><i class="fas fa-smile"></i> মুড ট্র্যাকার</a>
+                    <a href="<?php echo $base_path; ?>dashboard/journal.php"><i class="fas fa-book"></i> জার্নাল</a>
+                    <a href="<?php echo $base_path; ?>dashboard/mentor.php"><i class="fas fa-chalkboard-teacher"></i> মেন্টর</a>
+                    <a href="<?php echo $base_path; ?>dashboard/doctor.php"><i class="fas fa-user-md"></i> ডাক্তার</a>
+                    <a href="<?php echo $base_path; ?>dashboard/community.php"><i class="fas fa-users"></i> কমিউনিটি</a>
+                </div>
+            </div>
+            <a href="<?php echo $base_path; ?>dashboard/resources.php">রিসোর্স</a>
+            <a href="#contact">যোগাযোগ</a>
         </div>
         <div class="auth-buttons">
             <a href="<?php echo $base_path; ?>auth/login.php" class="btn-login">লগইন</a>
@@ -748,17 +816,8 @@ $base_path = '/mental%20health/';  // স্পেস এনকোডেড
 </footer>
 
 <script>
-    (function() {
-        console.log("✅ মেন্টোরা — বাংলায় মানসিক স্বাস্থ্য সবার জন্য।");
-        console.log("🔗 Base path: <?php echo $base_path; ?>");
-        
-        // Check all auth links
-        const links = document.querySelectorAll('a[href*="login"], a[href*="register"]');
-        console.log("📌 Found " + links.length + " auth links:");
-        links.forEach((link, i) => {
-            console.log(`${i}: ${link.href}`);
-        });
-    })();
+    console.log("✅ মেন্টোরা — বাংলায় মানসিক স্বাস্থ্য সবার জন্য।");
+    console.log("🔗 Base path: <?php echo $base_path; ?>");
 </script>
 
 </body>

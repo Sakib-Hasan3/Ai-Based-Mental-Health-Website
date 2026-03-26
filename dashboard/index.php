@@ -1432,7 +1432,7 @@ if (!$conn->connect_error) {
                 
                 <div class="mentor-card">
                     <div class="mentor-avatar">
-                        <img src="../assets/images/avatars/mentor2.jpg" alt="Prof. Anis">
+                        <img src="../assets/images/avatars/default-avatar.svg" alt="Prof. Anis">
                     </div>
                     <div class="mentor-name">অধ্যাপক মোঃ আনিস</div>
                     <div class="mentor-specialty">সাইকিয়াট্রিস্ট</div>
@@ -1449,7 +1449,7 @@ if (!$conn->connect_error) {
                 
                 <div class="mentor-card">
                     <div class="mentor-avatar">
-                        <img src="../assets/images/avatars/mentor3.jpg" alt="Sadia Islam">
+                        <img src="../assets/images/avatars/default-avatar.svg" alt="Sadia Islam">
                     </div>
                     <div class="mentor-name">সাদিয়া ইসলাম</div>
                     <div class="mentor-specialty">কাউন্সেলর</div>

@@ -32,14 +32,14 @@ if ($conn->connect_error) {
 $user_id = $_SESSION['user_id'];
 
 // Get user profile image
-$profile_image = 'default-avatar.png';
+$profile_image = 'default-avatar.svg';
 $user_sql = "SELECT profile_image FROM users WHERE id = ?";
 $user_stmt = $conn->prepare($user_sql);
 $user_stmt->bind_param("i", $user_id);
 $user_stmt->execute();
 $user_result = $user_stmt->get_result();
 if ($user_row = $user_result->fetch_assoc()) {
-    $profile_image = $user_row['profile_image'] ?? 'default-avatar.png';
+    $profile_image = $user_row['profile_image'] ?? 'default-avatar.svg';
 }
 $user_stmt->close();
 
@@ -839,7 +839,7 @@ $expertise_areas = explode(',', $mentor['expertise_areas'] ?? '');
                     <div class="profile-header">
                         <div class="profile-header-content">
                             <div class="mentor-avatar-large">
-                                <img src="../assets/images/avatars/<?php echo htmlspecialchars($mentor['user_profile_image'] ?? 'default-avatar.png'); ?>" alt="<?php echo htmlspecialchars($mentor['full_name']); ?>">
+                                <img src="../assets/images/avatars/<?php echo htmlspecialchars($mentor['user_profile_image'] ?? 'default-avatar.svg'); ?>" alt="<?php echo htmlspecialchars($mentor['full_name']); ?>">
                             </div>
                             <div class="profile-info">
                                 <h1><?php echo htmlspecialchars($mentor['full_name']); ?></h1>
@@ -959,7 +959,7 @@ $expertise_areas = explode(',', $mentor['expertise_areas'] ?? '');
                             <div class="review-card">
                                 <div class="review-header">
                                     <div class="reviewer-avatar">
-                                        <img src="../assets/images/avatars/<?php echo htmlspecialchars($review['profile_image'] ?? 'default-avatar.png'); ?>" alt="<?php echo htmlspecialchars($review['full_name']); ?>">
+                                        <img src="../assets/images/avatars/<?php echo htmlspecialchars($review['profile_image'] ?? 'default-avatar.svg'); ?>" alt="<?php echo htmlspecialchars($review['full_name']); ?>">
                                     </div>
                                     <div class="reviewer-info">
                                         <h4><?php echo htmlspecialchars($review['full_name']); ?></h4>
