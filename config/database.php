@@ -38,6 +38,12 @@ class Database {
             $this->conn->set_charset("utf8mb4");
             
         } catch (Exception $e) {
+            // For API calls, return JSON error
+            if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Database connection error']);
+                exit();
+            }
             die("Database Connection Error: " . $e->getMessage());
         }
     }
