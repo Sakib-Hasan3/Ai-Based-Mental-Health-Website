@@ -1,10 +1,7 @@
 <?php
-// api/achievements/claim-achievement.php
+// api/achievements/claim-achievement.php - SIMPLIFIED VERSION
 session_start();
 header('Content-Type: application/json');
-
-require_once '../../config/database.php';
-require_once '../../includes/auth_check.php';
 
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login first']);
@@ -12,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
-$achievement_id = $input['achievement_id'] ?? 0;
+$achievement_id = isset($input['achievement_id']) ? (int)$input['achievement_id'] : 0;
 $user_id = $_SESSION['user_id'];
 
 if (!$achievement_id) {
@@ -20,18 +17,26 @@ if (!$achievement_id) {
     exit();
 }
 
-$db = new Database();
-$conn = $db->getConnection();
+$host = 'localhost';
+$user = 'root';
+$pass = '';
+$dbname = 'mentora_db';
+
+$conn = new mysqli($host, $user, $pass, $dbname);
+
+if ($conn->connect_error) {
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit();
+}
 
 // Check if achievement is completed and not claimed
 $sql = "SELECT ua.*, am.points 
         FROM user_achievements ua
         JOIN achievements_master am ON ua.achievement_id = am.id
-        WHERE ua.user_id = ? AND ua.achievement_id = ? AND ua.is_completed = 1 AND ua.is_claimed = 0";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ii", $user_id, $achievement_id);
-$stmt->execute();
-$result = $stmt->get_result();
+        WHERE ua.user_id = $user_id AND ua.achievement_id = $achievement_id 
+        AND ua.is_completed = 1 AND ua.is_claimed = 0";
+
+$result = $conn->query($sql);
 
 if ($result->num_rows === 0) {
     echo json_encode(['success' => false, 'message' => 'Achievement cannot be claimed']);
@@ -42,18 +47,17 @@ if ($result->num_rows === 0) {
 $achievement = $result->fetch_assoc();
 
 // Mark as claimed
-$update_sql = "UPDATE user_achievements SET is_claimed = 1, claimed_at = NOW() WHERE user_id = ? AND achievement_id = ?";
-$update_stmt = $conn->prepare($update_sql);
-$update_stmt->bind_param("ii", $user_id, $achievement_id);
+$update_sql = "UPDATE user_achievements SET is_claimed = 1, claimed_at = NOW() 
+               WHERE user_id = $user_id AND achievement_id = $achievement_id";
 
-if ($update_stmt->execute()) {
+if ($conn->query($update_sql)) {
     echo json_encode([
         'success' => true,
         'message' => 'অ্যাচিভমেন্ট ক্লেইম করা হয়েছে!',
         'points' => $achievement['points']
     ]);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Claim failed']);
+    echo json_encode(['success' => false, 'message' => 'Claim failed: ' . $conn->error]);
 }
 
 $conn->close();
