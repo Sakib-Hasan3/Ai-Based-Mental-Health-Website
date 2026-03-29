@@ -3,9 +3,12 @@
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
+// Get the correct base path (handles folder with spaces)
+$base_path = '/mental%20health/';
+
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: ../dashboard/index.php');
+    header('Location: ' . $base_path . 'dashboard/index.php');
     exit();
 }
 
@@ -95,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     logUserActivity($user['id'], 'login', $_SERVER['REMOTE_ADDR']);
                     
                     // Redirect to dashboard
-                    header('Location: ../dashboard/index.php');
+                    header('Location: ' . $base_path . 'dashboard/index.php');
                     exit();
                 }
             } catch (Exception $e) {
