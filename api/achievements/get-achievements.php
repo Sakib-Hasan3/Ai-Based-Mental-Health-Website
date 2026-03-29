@@ -41,6 +41,7 @@ if ($recent) {
         $recent_achievements[] = $row;
     }
     
+    $stmt->close();
     echo json_encode(['success' => true, 'recent' => $recent_achievements]);
     $conn->close();
     exit();
@@ -79,19 +80,19 @@ $total_points = 0;
 while ($row = $result->fetch_assoc()) {
     // Calculate progress based on requirement type
     $progress = calculateProgress($row, $stats);
-    $row['progress_current'] = min($progress, $row['requirement_value']);
+    $row['progress_current'] = min($progress, $row['requirement_value'] ?? 0);
     
     // Check if completed (not already marked)
-    if ($row['progress_current'] >= $row['requirement_value'] && !$row['is_completed']) {
+    if (($row['progress_current'] ?? 0) >= ($row['requirement_value'] ?? 0) && !($row['is_completed'] ?? false)) {
         // Auto-mark as completed
-        markAchievementCompleted($conn, $user_id, $row['id']);
+        markAchievementCompleted($conn, $user_id, $row['id'], $row);
         $row['is_completed'] = 1;
     }
     
-    if ($row['is_completed']) $completed_count++;
-    if ($row['is_claimed']) {
+    if ($row['is_completed'] ?? false) $completed_count++;
+    if ($row['is_claimed'] ?? false) {
         $claimed_count++;
-        $total_points += $row['points'];
+        $total_points += $row['points'] ?? 0;
     }
     
     $achievements[] = $row;
@@ -124,24 +125,49 @@ function getUserStats($conn, $user_id) {
     ];
     
     // Get mood entries count
-    $result = $conn->query("SELECT COUNT(*) as count FROM mood_entries WHERE user_id = $user_id");
-    $stats['mood_count'] = $result->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM mood_entries WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stats['mood_count'] = $row ? $row['count'] : 0;
+    $stmt->close();
     
     // Get journal entries count
-    $result = $conn->query("SELECT COUNT(*) as count FROM journal_entries WHERE user_id = $user_id");
-    $stats['journal_count'] = $result->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM journal_entries WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stats['journal_count'] = $row ? $row['count'] : 0;
+    $stmt->close();
     
     // Get mentor sessions count
-    $result = $conn->query("SELECT COUNT(*) as count FROM mentor_enrollments WHERE user_id = $user_id AND status = 'completed'");
-    $stats['session_count'] = $result->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM mentor_enrollments WHERE user_id = ? AND status = 'completed'");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stats['session_count'] = $row ? $row['count'] : 0;
+    $stmt->close();
     
     // Get assessments count
-    $result = $conn->query("SELECT COUNT(*) as count FROM assessment_results WHERE user_id = $user_id");
-    $stats['assessment_count'] = $result->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM assessment_results WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stats['assessment_count'] = $row ? $row['count'] : 0;
+    $stmt->close();
     
     // Get community posts count
-    $result = $conn->query("SELECT COUNT(*) as count FROM community_posts WHERE user_id = $user_id");
-    $stats['community_posts'] = $result->fetch_assoc()['count'];
+    $stmt = $conn->prepare("SELECT COUNT(*) as count FROM community_posts WHERE user_id = ?");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stats['community_posts'] = $row ? $row['count'] : 0;
+    $stmt->close();
     
     // Calculate streak days (simplified)
     $stats['streak_days'] = calculateStreak($conn, $user_id);
@@ -151,19 +177,24 @@ function getUserStats($conn, $user_id) {
 
 function calculateStreak($conn, $user_id) {
     // Simple streak calculation based on mood entries
-    $result = $conn->query("SELECT COUNT(DISTINCT entry_date) as days 
+    $stmt = $conn->prepare("SELECT COUNT(DISTINCT entry_date) as days 
                             FROM mood_entries 
-                            WHERE user_id = $user_id 
+                            WHERE user_id = ? 
                             AND entry_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    return $result->fetch_assoc()['days'];
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $stmt->close();
+    return $row['days'] ?? 0;
 }
 
 function calculateProgress($achievement, $stats) {
-    $type = $achievement['requirement_type'];
+    $type = $achievement['requirement_type'] ?? '';
     return isset($stats[$type]) ? $stats[$type] : 0;
 }
 
-function markAchievementCompleted($conn, $user_id, $achievement_id) {
+function markAchievementCompleted($conn, $user_id, $achievement_id, $achievement) {
     $sql = "UPDATE user_achievements 
             SET is_completed = 1, completed_at = NOW() 
             WHERE user_id = ? AND achievement_id = ?";
@@ -176,8 +207,9 @@ function markAchievementCompleted($conn, $user_id, $achievement_id) {
         $sql = "INSERT INTO user_achievements (user_id, achievement_id, progress_current, progress_target, is_completed, completed_at)
                 VALUES (?, ?, ?, ?, 1, NOW())";
         $stmt = $conn->prepare($sql);
-        $target = $achievement['requirement_value'];
-        $stmt->bind_param("iiii", $user_id, $achievement_id, $target, $target);
+        $target = $achievement['requirement_value'] ?? 0;
+        $progress = $achievement['progress_current'] ?? 0;
+        $stmt->bind_param("iiii", $user_id, $achievement_id, $progress, $target);
         $stmt->execute();
     }
     $stmt->close();
