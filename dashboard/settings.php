@@ -1,8 +1,18 @@
 <?php
 // dashboard/settings.php
-session_start();
-require_once '../includes/auth_check.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../error.log');
 
+session_start();
+
+// Use absolute path for includes
+$basePath = dirname(__DIR__);
+require_once $basePath . '/config/database.php';
+require_once $basePath . '/includes/auth_check.php';
+
+// Redundant check since auth_check.php already checks this, but kept for clarity
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit();
@@ -12,21 +22,28 @@ $user_name = $_SESSION['user_name'] ?? 'User';
 $user_email = $_SESSION['user_email'] ?? '';
 $user_id = $_SESSION['user_id'];
 
-// Get profile image
-$conn = new mysqli('localhost', 'root', '', 'mentora_db');
+// Get profile image using Database class
 $profile_image = 'default-avatar.png';
-
-if (!$conn->connect_error) {
-    $sql = "SELECT profile_image FROM users WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $profile_image = $row['profile_image'] ?? 'default-avatar.png';
+try {
+    $db = Database::getInstance();
+    $conn = $db->getConnection();
+    
+    if ($conn) {
+        $sql = "SELECT profile_image FROM users WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $profile_image = $row['profile_image'] ?? 'default-avatar.png';
+            }
+            $stmt->close();
+        }
     }
-    $stmt->close();
-    $conn->close();
+} catch (Exception $e) {
+    // If database query fails, use default image
+    $profile_image = 'default-avatar.png';
 }
 ?>
 <!DOCTYPE html>

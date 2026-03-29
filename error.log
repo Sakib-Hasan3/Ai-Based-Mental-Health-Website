@@ -1,0 +1,8 @@
+[29-Mar-2026 14:07:19 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from global scope in C:\xampp\htdocs\mental health\dashboard\settings.php:28
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\mental health\dashboard\settings.php on line 28
+[29-Mar-2026 14:07:37 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to private Database::__construct() from global scope in C:\xampp\htdocs\mental health\dashboard\settings.php:28
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\mental health\dashboard\settings.php on line 28
