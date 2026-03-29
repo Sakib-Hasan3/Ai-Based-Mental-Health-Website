@@ -34,7 +34,7 @@ $(document).ready(function() {
 
 // ==================== LOAD RESOURCES ====================
 function loadResources() {
-    let url = '../resources/api/get-resources.php?';
+    let url = '../api/resource/get-resources.php?';
     if (currentType !== 'all') {
         url += 'type=' + encodeURIComponent(currentType) + '&';
     }
