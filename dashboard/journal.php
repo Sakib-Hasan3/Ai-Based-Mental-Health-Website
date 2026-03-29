@@ -99,7 +99,7 @@ $moodOptions = [
             
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="index.php" class="nav-link">
+                    <a href="./index.php" class="nav-link">
                         <i class="fas fa-home"></i>
                         <span>ড্যাশবোর্ড</span>
                     </a>
