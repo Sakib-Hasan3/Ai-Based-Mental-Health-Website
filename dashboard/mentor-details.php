@@ -816,11 +816,11 @@ $expertise_areas = explode(',', $mentor['expertise_areas'] ?? '');
                 <li class="nav-item"><a href="/mental%20health/dashboard/mood-tracker.php" class="nav-link"><i class="fas fa-smile"></i><span>মুড ট্র্যাকার</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/assessment.php" class="nav-link"><i class="fas fa-brain"></i><span>মানসিক স্বাস্থ্য যাচাই</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/journal.php" class="nav-link"><i class="fas fa-book"></i><span>জার্নাল</span></a></li>
-                <li class="nav-item"><a href="/mental%20health/dashboard/mentor.php" class="nav-link"><i class="fas fa-chalkboard-teacher"></i><span>মেন্টর</span></a></li>
+                <li class="nav-item"><a href="/mental%20health/dashboard/mentor.php" class="nav-link active"><i class="fas fa-chalkboard-teacher"></i><span>মেন্টর</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/community.php" class="nav-link"><i class="fas fa-users"></i><span>কমিউনিটি</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/doctor.php" class="nav-link"><i class="fas fa-user-md"></i><span>ডাক্তার</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/resources.php" class="nav-link"><i class="fas fa-book-open"></i><span>রিসোর্স</span></a></li>
-                <li class="nav-item"><a href="/mental%20health/dashboard/achievements.php" class="nav-link active"><i class="fas fa-trophy"></i><span>অ্যাচিভমেন্ট</span></a></li>
+                <li class="nav-item"><a href="/mental%20health/dashboard/achievements.php" class="nav-link"><i class="fas fa-trophy"></i><span>অ্যাচিভমেন্ট</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/auth/logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i><span>লগআউট</span></a></li>
             </ul>
         </div>
@@ -833,7 +833,7 @@ $expertise_areas = explode(',', $mentor['expertise_areas'] ?? '');
             
             <div class="mentor-detail-container">
                 <!-- Back Link -->
-                <a href="mentor.php" class="back-link">
+                <a href="/mental%20health/dashboard/mentor.php" class="back-link">
                     <i class="fas fa-arrow-left"></i> সব মেন্টর দেখুন
                 </a>
                 

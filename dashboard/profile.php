@@ -315,7 +315,7 @@ $wellness_score = 85; // Default, you can calculate from mood entries
             
             <ul class="nav-menu">
                 <li class="nav-item"><a href="/mental%20health/dashboard/index.php" class="nav-link"><i class="fas fa-home"></i><span>ড্যাশবোর্ড</span></a></li>
-                <li class="nav-item"><a href="/mental%20health/dashboard/profile.php" class="nav-link"><i class="fas fa-user-circle"></i><span>প্রোফাইল</span></a></li>
+                <li class="nav-item"><a href="/mental%20health/dashboard/profile.php" class="nav-link active"><i class="fas fa-user-circle"></i><span>প্রোফাইল</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/mood-tracker.php" class="nav-link"><i class="fas fa-smile"></i><span>মুড ট্র্যাকার</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/assessment.php" class="nav-link"><i class="fas fa-brain"></i><span>মানসিক স্বাস্থ্য যাচাই</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/journal.php" class="nav-link"><i class="fas fa-book"></i><span>জার্নাল</span></a></li>
@@ -323,7 +323,7 @@ $wellness_score = 85; // Default, you can calculate from mood entries
                 <li class="nav-item"><a href="/mental%20health/dashboard/community.php" class="nav-link"><i class="fas fa-users"></i><span>কমিউনিটি</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/doctor.php" class="nav-link"><i class="fas fa-user-md"></i><span>ডাক্তার</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/dashboard/resources.php" class="nav-link"><i class="fas fa-book-open"></i><span>রিসোর্স</span></a></li>
-                <li class="nav-item"><a href="/mental%20health/dashboard/achievements.php" class="nav-link active"><i class="fas fa-trophy"></i><span>অ্যাচিভমেন্ট</span></a></li>
+                <li class="nav-item"><a href="/mental%20health/dashboard/achievements.php" class="nav-link"><i class="fas fa-trophy"></i><span>অ্যাচিভমেন্ট</span></a></li>
                 <li class="nav-item"><a href="/mental%20health/auth/logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i><span>লগআউট</span></a></li>
             </ul>
         </div>
@@ -409,7 +409,7 @@ $wellness_score = 85; // Default, you can calculate from mood entries
                         <div class="wellness-score"><?php echo $wellness_score; ?>%</div>
                         <div class="wellness-message">🌟 আপনি ভালো করছেন! ধারাবাহিক থাকুন</div>
                     </div>
-                    <a href="assessment.php" class="wellness-btn">
+                    <a href="/mental%20health/dashboard/assessment.php" class="wellness-btn">
                         <i class="fas fa-chart-line"></i> বিস্তারিত দেখুন
                     </a>
                 </div>

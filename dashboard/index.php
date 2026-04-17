@@ -903,81 +903,81 @@ if (!$conn->connect_error) {
             
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="index.php" class="nav-link active">
+                    <a href="/mental%20health/dashboard/index.php" class="nav-link active">
                         <i class="fas fa-home"></i>
                         <span>ড্যাশবোর্ড</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="profile.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/profile.php" class="nav-link">
                         <i class="fas fa-user"></i>
                         <span>প্রোফাইল</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="chatbot.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/chatbot.php" class="nav-link">
                         <i class="fas fa-robot"></i>
                         <span>মনের বন্ধু</span>
                         <span class="badge">new</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="mood-tracker.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/mood-tracker.php" class="nav-link">
                         <i class="fas fa-smile"></i>
                         <span>মুড ট্র্যাকার</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="journal.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/journal.php" class="nav-link">
                         <i class="fas fa-book"></i>
                         <span>জার্নাল</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="mentor.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/mentor.php" class="nav-link">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <span>মেন্টর</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="doctor.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/doctor.php" class="nav-link">
                         <i class="fas fa-user-md"></i>
                         <span>ডাক্তার</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="community.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/community.php" class="nav-link">
                         <i class="fas fa-users"></i>
                         <span>কমিউনিটি</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="resources.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/resources.php" class="nav-link">
                         <i class="fas fa-video"></i>
                         <span>রিসোর্স</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="achievements.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/achievements.php" class="nav-link">
                         <i class="fas fa-trophy"></i>
                         <span>অ্যাচিভমেন্ট</span>
                         <span class="badge">5</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="assessment.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/assessment.php" class="nav-link">
                         <i class="fas fa-brain"></i>
                         <span>মানসিক যাচাই</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="settings.php" class="nav-link">
+                    <a href="/mental%20health/dashboard/settings.php" class="nav-link">
                         <i class="fas fa-cog"></i>
                         <span>সেটিংস</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="../auth/logout.php" class="nav-link">
+                    <a href="/mental%20health/auth/logout.php" class="nav-link">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>লগআউট</span>
                     </a>
@@ -1293,7 +1293,7 @@ if (!$conn->connect_error) {
                         <i class="fas fa-smile"></i>
                         আজ কেমন লাগছে?
                     </h3>
-                    <a href="mood-tracker.php" class="view-link">সব দেখুন →</a>
+                    <a href="/mental%20health/dashboard/mood-tracker.php" class="view-link">সব দেখুন →</a>
                 </div>
                 
                 <div class="mood-grid">
@@ -1409,7 +1409,7 @@ if (!$conn->connect_error) {
                     <i class="fas fa-star"></i>
                     প্রস্তাবিত মেন্টর
                 </h3>
-                <a href="mentor.php" class="view-link">সব দেখুন →</a>
+                <a href="/mental%20health/dashboard/mentor.php" class="view-link">সব দেখুন →</a>
             </div>
             
             <div class="mentors-grid">
@@ -1471,7 +1471,7 @@ if (!$conn->connect_error) {
                     <i class="fas fa-book-open"></i>
                     সাম্প্রতিক জার্নাল
                 </h3>
-                <a href="journal.php" class="view-link">নতুন লিখুন +</a>
+                <a href="/mental%20health/dashboard/journal.php" class="view-link">নতুন লিখুন +</a>
             </div>
             
             <div class="journal-grid">
