@@ -47,9 +47,9 @@ RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 
-# Redirect index.php to root
-RewriteCond %{THE_REQUEST} ^.*/index\.php
-RewriteRule ^(.*)index.php$ /$1 [R=301,L]
+# Redirect only root index.php to / (but preserve subfolder structure)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.php
+RewriteRule ^index\.php$ / [R=301,L]
 
 # ============================================
 # ERROR PAGES

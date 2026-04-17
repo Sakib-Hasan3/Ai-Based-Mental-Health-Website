@@ -1,6 +1,28 @@
 <?php
 // auth/verify-email-sent.php
-$email = $_GET['email'] ?? 'আপনার ইমেইল';
+require_once("../db.php");
+
+$email = $_GET['email'] ?? '';
+
+// Get the verification token for this email
+$token = '';
+if($email) {
+    $stmt = $conn->prepare("
+        SELECT ev.token FROM email_verifications ev
+        JOIN users u ON ev.user_id = u.id
+        WHERE u.email = ? AND ev.verified_at IS NULL AND ev.expires_at > NOW()
+        ORDER BY ev.created_at DESC LIMIT 1
+    ");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if($row = $result->fetch_assoc()) {
+        $token = $row['token'];
+    }
+}
+
+$verification_url = $token ? "http://" . $_SERVER['HTTP_HOST'] . "/auth/verify-email.php?token=" . $token : '';
 ?>
 <!DOCTYPE html>
 <html lang="bn">
@@ -195,6 +217,31 @@ $email = $_GET['email'] ?? 'আপনার ইমেইল';
             <p style="color: #64748b; margin: 20px 0;">
                 ইমেইল পাননি? আপনার স্প্যাম বা প্রচার ফোল্ডার চেক করুন। অথবা নীচে ক্লিক করুন।
             </p>
+            
+            <?php if($verification_url): ?>
+                <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                    <p style="color: #065f46; margin: 0 0 15px 0;">
+                        <strong>🔗 আপনার যাচাইকরণ লিঙ্ক (Development Mode):</strong>
+                    </p>
+                    <p style="background: white; padding: 12px; border-radius: 5px; word-break: break-all; color: #0d9488; font-size: 12px; margin: 10px 0;">
+                        <?php echo htmlspecialchars($verification_url); ?>
+                    </p>
+                    <p style="color: #065f46; margin: 10px 0 0 0; font-size: 13px;">
+                        নীচে ক্লিক করুন বা উপরের লিঙ্কটি ব্রাউজারে কপি করুন:
+                    </p>
+                </div>
+                
+                <a href="<?php echo htmlspecialchars($verification_url); ?>" class="button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <i class="fas fa-check-circle me-2"></i>
+                    এখনই ইমেইল যাচাই করুন
+                </a>
+            <?php else: ?>
+                <div style="background: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="color: #7f1d1d; margin: 0;">
+                        <strong>⚠️ ত্রুটি:</strong> যাচাইকরণ লিঙ্ক পাওয়া যায়নি। এখনই লগইন করার চেষ্টা করুন।
+                    </p>
+                </div>
+            <?php endif; ?>
             
             <a href="login.php" class="button">
                 <i class="fas fa-sign-in-alt me-2"></i>

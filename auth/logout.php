@@ -2,6 +2,8 @@
 // auth/logout.php
 require_once '../includes/functions.php';
 
+$base_path = '/mental%20health/';
+
 // Log activity if user was logged in
 if (isLoggedIn()) {
     logUserActivity($_SESSION['user_id'], 'logout', $_SERVER['REMOTE_ADDR']);
@@ -30,7 +32,7 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Redirect to login page
-header('Location: login.php?logged_out=1');
+// Redirect to home page
+header('Location: ' . $base_path . 'index.php?logged_out=1');
 exit();
 ?>

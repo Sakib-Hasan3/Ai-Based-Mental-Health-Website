@@ -4,6 +4,9 @@
 session_start();
 require_once("../db.php");
 
+// Get the correct base path (handles folder with spaces)
+$base_path = '/mental%20health/';
+
 $email = trim($_POST['email'] ?? '');
 $password = trim($_POST['password'] ?? '');
 
@@ -12,8 +15,8 @@ if (empty($email) || empty($password)) {
     exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
-$stmt->bind_param("s", $email);
+$stmt = $conn->prepare("SELECT * FROM users WHERE email = ? OR phone = ? LIMIT 1");
+$stmt->bind_param("ss", $email, $email);
 $stmt->execute();
 
 $result = $stmt->get_result();
@@ -23,12 +26,6 @@ if ($result->num_rows == 1) {
 
     if (!password_verify($password, $user['password'])) {
         header("Location: login.php?error=Invalid credentials");
-        exit();
-    }
-
-    // Check if email is verified
-    if ($user['is_verified'] == 0) {
-        header("Location: login.php?error=Please verify your email first. Check your inbox for verification link.");
         exit();
     }
 
@@ -47,7 +44,7 @@ if ($result->num_rows == 1) {
     $update->bind_param("si", $ip, $user['id']);
     $update->execute();
 
-    header("Location: ../dashboard/index.php");
+    header("Location: " . $base_path . "dashboard/index.php");
     exit();
 } else {
     header("Location: login.php?error=Invalid credentials");

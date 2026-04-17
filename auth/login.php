@@ -6,12 +6,6 @@ require_once '../includes/functions.php';
 // Get the correct base path (handles folder with spaces)
 $base_path = '/mental%20health/';
 
-// Redirect if already logged in
-if (isset($_SESSION['user_id'])) {
-    header('Location: ' . $base_path . 'dashboard/index.php');
-    exit();
-}
-
 $error = '';
 $email = '';
 
@@ -69,10 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         [$user['id']]
                     );
                     $error = 'ইমেইল/ফোন বা পাসওয়ার্ড ভুল।';
-                } 
-                // Check if email is verified
-                else if (!$user['is_verified']) {
-                    $error = 'ইমেইল ভেরিফাই করা হয়নি। আপনার ইমেইলে যাচাইকরণ লিঙ্ক পাঠানো হয়েছে।';
                 } 
                 else {
                     // Login successful - reset attempts and update last login
@@ -584,63 +574,6 @@ $csrf_token = generateCSRFToken();
             text-decoration: underline;
         }
         
-        /* Demo Credentials */
-        .demo-box {
-            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
-            border: 2px dashed #667eea;
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 25px;
-            text-align: center;
-            animation: glow 2s infinite;
-        }
-        
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.3); }
-            50% { box-shadow: 0 0 20px 5px rgba(102, 126, 234, 0.3); }
-        }
-        
-        .demo-box h5 {
-            color: #374151;
-            font-size: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .demo-box h5 i {
-            color: #667eea;
-        }
-        
-        .demo-credentials {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .demo-item {
-            text-align: center;
-        }
-        
-        .demo-item .label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 5px;
-        }
-        
-        .demo-item .value {
-            font-size: 16px;
-            font-weight: 600;
-            color: #667eea;
-            background: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
         /* Responsive Design */
         @media (max-width: 992px) {
             .login-container {
@@ -814,23 +747,6 @@ $csrf_token = generateCSRFToken();
             <div class="register-link">
                 <span>এখনও অ্যাকাউন্ট নেই?</span>
                 <a href="register.php">রেজিস্টার করুন →</a>
-            </div>
-            
-            <!-- Test Setup Link -->
-            <div class="demo-box">
-                <h5>
-                    <i class="fas fa-flask"></i>
-                    টেস্ট অ্যাকাউন্ট
-                </h5>
-                <p style="margin: 10px 0; font-size: 14px; color: #6b7280;">টেস্ট করতে চাইলে এখানে ক্লিক করুন:</p>
-                <a href="create-test-user.php" style="display: inline-block; background: #667eea; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-top: 10px;">টেস্ট ইউজার তৈরি করুন</a>
-                
-                <!-- Force Logout Link -->
-                <p style="margin-top: 15px; font-size: 12px; color: #9ca3af;">
-                    অথবা 
-                    <a href="logout.php" style="color: #667eea; text-decoration: underline;">এখানে ক্লিক করুন</a>
-                    সেশন ক্লিয়ার করতে
-                </p>
             </div>
         </div>
     </div>
