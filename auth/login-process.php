@@ -26,6 +26,12 @@ if ($result->num_rows == 1) {
         exit();
     }
 
+    // Check if email is verified
+    if ($user['is_verified'] == 0) {
+        header("Location: login.php?error=Please verify your email first. Check your inbox for verification link.");
+        exit();
+    }
+
     if ($user['is_active'] == 0) {
         header("Location: login.php?error=Account disabled");
         exit();
