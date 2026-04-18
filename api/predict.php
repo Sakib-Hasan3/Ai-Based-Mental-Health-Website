@@ -1,5 +1,13 @@
 <?php
-// api/predict.php - Mental Health Assessment Prediction
+/**
+ * api/predict.php - Mental Health Assessment Prediction
+ * 
+ * This endpoint receives assessment data from the frontend and sends it to the
+ * ML backend server (ml_server.py) running on port 5000 for prediction.
+ * 
+ * Fallback: If the ML server is not running, uses rule-based calculation
+ */
+
 session_start();
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -7,23 +15,22 @@ header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Log every request
-error_log("[PREDICT.PHP] REQUEST: Method=" . $_SERVER['REQUEST_METHOD'] . " Time=" . date('Y-m-d H:i:s'));
-error_log("[PREDICT.PHP] POST data: " . print_r($_POST, true));
-error_log("[PREDICT.PHP] Session user_id: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'));
+error_log("[PREDICT.PHP] " . date('Y-m-d H:i:s') . " | Method: " . $_SERVER['REQUEST_METHOD']);
+error_log("[PREDICT.PHP] User ID: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'));
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     error_log("[PREDICT.PHP] ERROR: User not logged in");
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Please login first']);
+    echo json_encode(['success' => false, 'error' => 'Please login first']);
     exit();
 }
 
-// Get POST data
+// Get POST data from both JSON and form data
 $input = null;
-$rawInput = file_get_contents('php://input');
-error_log("[PREDICT.PHP] Raw input length: " . strlen($rawInput));
 
+// Try JSON first
+$rawInput = file_get_contents('php://input');
 if ($rawInput) {
     $input = json_decode($rawInput, true);
 }
@@ -33,38 +40,41 @@ if (!$input || empty($input)) {
     $input = $_POST;
 }
 
+// Validate input
 if (!$input || empty($input)) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'No data received']);
+    echo json_encode(['success' => false, 'error' => 'No assessment data received']);
     exit();
 }
 
-// Call Flask API first
+error_log("[PREDICT.PHP] Data received. Fields: " . implode(', ', array_keys($input)));
+
+// Try Flask ML Server first
 $flaskResponse = callFlaskAPI($input);
-if ($flaskResponse) {
+
+if ($flaskResponse !== null) {
+    // Flask server responded successfully
+    error_log("[PREDICT.PHP] ✅ Flask ML Server response received");
     http_response_code(200);
-    if (isset($flaskResponse['success'])) {
-        echo json_encode($flaskResponse);
-    } else if (isset($flaskResponse['risk_percentage'])) {
-        echo json_encode(['success' => true, 'data' => $flaskResponse]);
-    } else {
-        echo json_encode(['success' => true, 'data' => $flaskResponse]);
-    }
+    echo json_encode($flaskResponse);
     exit();
 }
 
-// Fallback: Rule-based calculation
+// Fallback: Rule-based calculation if Flask server is unavailable
+error_log("[PREDICT.PHP] ⚠️ Using fallback rule-based calculation");
 $result = calculateFallbackRisk($input);
 http_response_code(200);
-echo json_encode(['success' => true, 'data' => $result, 'method' => 'fallback']);
+echo json_encode(['success' => true, 'data' => $result, 'method' => 'fallback', 'warning' => 'ML server not available']);
 exit();
 
 /**
- * Call Flask ML API
+ * Call Flask ML API for prediction
+ * Server should be running on http://localhost:5000
  */
 function callFlaskAPI($input) {
-    $url = 'http://127.0.0.1:5000/api/predict';
+    $flaskUrl = 'http://127.0.0.1:5000/api/predict';
     
+    // Build request data with proper field names
     $data = [
         'Gender' => $input['gender'] ?? '',
         'Occupation' => $input['occupation'] ?? '',
@@ -82,32 +92,69 @@ function callFlaskAPI($input) {
         'care_options' => $input['care_options'] ?? ''
     ];
     
-    $json = json_encode($data);
+    $jsonData = json_encode($data);
     
-    $opts = [
-        'http' => [
-            'method' => 'POST',
-            'header' => "Content-Type: application/json\r\n",
-            'content' => $json,
-            'timeout' => 8
-        ]
-    ];
+    error_log("[PREDICT.PHP] 🔄 Calling Flask API at: $flaskUrl");
+    error_log("[PREDICT.PHP] Sending: " . implode(', ', array_keys($data)));
     
-    $context = stream_context_create($opts);
+    // Setup cURL for better error handling
+    $ch = curl_init($flaskUrl);
     
-    $response = @file_get_contents($url, false, $context);
-    if ($response === false) {
-        error_log("Flask call failed");
+    if ($ch === false) {
+        error_log("[PREDICT.PHP] ❌ Failed to initialize cURL");
         return null;
     }
     
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => $jsonData,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_VERBOSE => false
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    // Check for cURL errors
+    if ($error) {
+        error_log("[PREDICT.PHP] ❌ cURL error: $error");
+        return null;
+    }
+    
+    // Check HTTP status code
+    if ($httpCode !== 200) {
+        error_log("[PREDICT.PHP] ❌ Flask returned HTTP $httpCode");
+        error_log("[PREDICT.PHP] Response: " . substr($response, 0, 200));
+        return null;
+    }
+    
+    // Decode response
     $result = json_decode($response, true);
+    
     if ($result === null) {
-        error_log("Flask JSON decode failed: $response");
+        error_log("[PREDICT.PHP] ❌ Failed to parse Flask response as JSON");
+        error_log("[PREDICT.PHP] Raw response: " . substr($response, 0, 200));
         return null;
     }
     
-    return $result;
+    // Check if response indicates success
+    if (isset($result['success']) && $result['success'] === true) {
+        error_log("[PREDICT.PHP] ✅ Flask returned successful prediction");
+        return $result;
+    }
+    
+    // Also accept responses with data field directly
+    if (isset($result['data'])) {
+        error_log("[PREDICT.PHP] ✅ Flask returned prediction in data field");
+        return $result;
+    }
+    
+    error_log("[PREDICT.PHP] ❌ Invalid Flask response format");
+    return null;
 }
 
 /**
