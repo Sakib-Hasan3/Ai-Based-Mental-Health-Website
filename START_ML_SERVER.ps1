@@ -4,13 +4,13 @@
 
 # Get the directory of this script
 $ScriptDir = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-$ProjectDir = Split-Path -Parent -Path $ScriptDir
+$MLModelDir = Join-Path -Path $ScriptDir -ChildPath "assets\ml_model"
 
 Write-Host ""
 Write-Host "=====================================================`n" -ForegroundColor Cyan
 Write-Host "  Mental Health ML Prediction Server" -ForegroundColor Yellow
 Write-Host "`n=====================================================`n" -ForegroundColor Cyan
-Write-Host "Project Directory: $ProjectDir`n" -ForegroundColor Gray
+Write-Host "ML Model Directory: $MLModelDir`n" -ForegroundColor Gray
 
 # Check if Python is installed
 try {
@@ -27,7 +27,7 @@ try {
 # Check and install required packages
 Write-Host "`nChecking required packages...`n" -ForegroundColor Cyan
 
-$packages = @("flask", "flask_cors", "numpy", "pandas")
+$packages = @("flask", "flask_cors", "numpy", "pandas", "sklearn")
 
 foreach ($package in $packages) {
     try {
@@ -50,5 +50,5 @@ Write-Host "Health check: http://localhost:5000/api/health`n" -ForegroundColor C
 Write-Host "Press Ctrl+C to stop the server`n" -ForegroundColor Yellow
 
 # Change directory and start server
-Set-Location "$ProjectDir\api"
+Set-Location $MLModelDir
 python ml_server.py

@@ -7,14 +7,14 @@ setlocal enabledelayedexpansion
 
 REM Get the directory of this script
 set SCRIPT_DIR=%~dp0
-set PROJECT_DIR=%SCRIPT_DIR:~0,-5%
+set ML_MODEL_DIR=%SCRIPT_DIR:~0,-1%\assets\ml_model
 
 echo.
 echo =====================================================
 echo   Mental Health ML Prediction Server
 echo =====================================================
 echo.
-echo Project Directory: %PROJECT_DIR%
+echo ML Model Directory: %ML_MODEL_DIR%
 echo.
 
 REM Check if Python is installed
@@ -52,15 +52,6 @@ if errorlevel 1 (
     echo [OK] Flask-CORS installed
 )
 
-python -c "import pickle" >nul 2>&1
-if errorlevel 1 (
-    echo.
-    echo [*] pickle not found. Installing...
-    pip install pickle-mixin
-) else (
-    echo [OK] pickle installed
-)
-
 python -c "import numpy" >nul 2>&1
 if errorlevel 1 (
     echo.
@@ -79,6 +70,15 @@ if errorlevel 1 (
     echo [OK] Pandas installed
 )
 
+python -c "import sklearn" >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo [*] scikit-learn not found. Installing...
+    pip install scikit-learn
+) else (
+    echo [OK] scikit-learn installed
+)
+
 echo.
 echo =====================================================
 echo   Starting ML Server...
@@ -91,7 +91,7 @@ echo.
 echo Press Ctrl+C to stop the server
 echo.
 
-cd /d "%PROJECT_DIR%\api"
+cd /d "%ML_MODEL_DIR%"
 python ml_server.py
 
 pause
