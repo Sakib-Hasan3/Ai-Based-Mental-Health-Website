@@ -1,3 +1,4 @@
+
 <?php
 // api/settings/delete-account.php
 session_start();
