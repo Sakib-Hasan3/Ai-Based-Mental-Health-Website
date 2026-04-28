@@ -1,3 +1,4 @@
+
 <?php
 // api/settings/get-settings.php
 header('Content-Type: application/json');
